@@ -110,24 +110,10 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
     })
   }));
 
-  const insertIssueAndCheck = async () => {
-    // const request: RequestCreateIssue = {
-    //   issueName: '',
-    //   issueChecks: []
-    // }
+  const insertIssue = async () => {
     const request: RequestCreateIssue = {
       issueName: issueAndCheck,
     }
-
-    // const orgText: string = issueAndCheck;
-
-    // const prcArr: string[] = orgText.split('*');
-    // request.issueName = prcArr[0].replace(/\n/g, "");;
-
-    // for (let i = 1; i < prcArr.length; i++) {
-    //   request.issueChecks.push(prcArr[i].trim());
-    // }
-
     kanbanService.insertIssue(request);
   };
 
@@ -154,7 +140,7 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
                 style={{minHeight: 200}}
                 onKeyPress= {(e: any) => {
                   if (e.key === 'Enter' && e.ctrlKey) {
-                    insertIssueAndCheck();
+                    insertIssue();
                   } 
                 }}
                 onChange={(e: any) => {

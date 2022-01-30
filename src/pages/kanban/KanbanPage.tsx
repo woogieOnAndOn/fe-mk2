@@ -5,15 +5,8 @@ import './KanbanPage.css';
 import { DndProvider, DropTargetMonitor, useDrag, useDrop } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { 
-  ComponentType, 
   IssueState, 
   Issue,
-  RequestCreateIssue,
-  RequestUpdateIssueName,
-  RequestUpdateIssueUseTime,
-  RequestUpdateIssueState,
-  RequestDeleteIssue,
-  ResponseRetrieveIssue,
 } from '../../model/issue.model'
 import KanbanService from '../../service/kanban.service';
 import * as commonModel from '../../model/common.model';
@@ -56,32 +49,36 @@ const KanbanPage = () => {
   }, [reset]);
 
   return (
-    <Grid columns='equal'>
-      <Grid.Row>
-        <DndProvider backend={HTML5Backend}>
-          <AcceptableColumn issueState={IssueState.WAIT} labelColor={'green'} issues={issues} setIssues={setIssues} setReset={setReset} showActionBtns={showActionBtns} setShowActionBtns={setShowActionBtns} >
-            {issues.map((data, index) => (
-              data.issueState === IssueState.WAIT && <MovableItem key={index} issue={data} showActionBtns={showActionBtns} />
-            ))}
-          </AcceptableColumn>
-          <AcceptableColumn issueState={IssueState.START} labelColor={'yellow'} issues={issues} setIssues={setIssues} setReset={setReset} showActionBtns={showActionBtns} setShowActionBtns={setShowActionBtns} >
-            {issues.map((data, index) => (
-              data.issueState === IssueState.START && <MovableItem key={index} issue={data} showActionBtns={showActionBtns} />
-            ))}
-          </AcceptableColumn>
-          <AcceptableColumn issueState={IssueState.COMPLETE} labelColor={'blue'} issues={issues} setIssues={setIssues} setReset={setReset} showActionBtns={showActionBtns} setShowActionBtns={setShowActionBtns} >
-            {issues.map((data, index) => (
-              data.issueState === IssueState.COMPLETE && <MovableItem key={index} issue={data} showActionBtns={showActionBtns} />
-            ))}
-          </AcceptableColumn>
-          <AcceptableColumn issueState={IssueState.END} labelColor={'red'} issues={issues} setIssues={setIssues} setReset={setReset} showActionBtns={showActionBtns} setShowActionBtns={setShowActionBtns} >
-            {issues.map((data, index) => (
-              data.issueState === IssueState.END && <MovableItem key={index} issue={data} showActionBtns={showActionBtns} />
-            ))}
-          </AcceptableColumn>
-        </DndProvider>
-      </Grid.Row>
-    </Grid>
+    <>
+      {issues && issues.length > 0 && 
+        <Grid columns='equal'>
+          <Grid.Row>
+            <DndProvider backend={HTML5Backend}>
+              <AcceptableColumn issueState={IssueState.WAIT} labelColor={'green'} issues={issues} setIssues={setIssues} setReset={setReset} showActionBtns={showActionBtns} setShowActionBtns={setShowActionBtns} >
+                {issues.map((data, index) => (
+                  data.issueState === IssueState.WAIT && <MovableItem key={index} issue={data} showActionBtns={showActionBtns} />
+                ))}
+              </AcceptableColumn>
+              <AcceptableColumn issueState={IssueState.START} labelColor={'yellow'} issues={issues} setIssues={setIssues} setReset={setReset} showActionBtns={showActionBtns} setShowActionBtns={setShowActionBtns} >
+                {issues.map((data, index) => (
+                  data.issueState === IssueState.START && <MovableItem key={index} issue={data} showActionBtns={showActionBtns} />
+                ))}
+              </AcceptableColumn>
+              <AcceptableColumn issueState={IssueState.COMPLETE} labelColor={'blue'} issues={issues} setIssues={setIssues} setReset={setReset} showActionBtns={showActionBtns} setShowActionBtns={setShowActionBtns} >
+                {issues.map((data, index) => (
+                  data.issueState === IssueState.COMPLETE && <MovableItem key={index} issue={data} showActionBtns={showActionBtns} />
+                ))}
+              </AcceptableColumn>
+              <AcceptableColumn issueState={IssueState.END} labelColor={'red'} issues={issues} setIssues={setIssues} setReset={setReset} showActionBtns={showActionBtns} setShowActionBtns={setShowActionBtns} >
+                {issues.map((data, index) => (
+                  data.issueState === IssueState.END && <MovableItem key={index} issue={data} showActionBtns={showActionBtns} />
+                ))}
+              </AcceptableColumn>
+            </DndProvider>
+          </Grid.Row>
+        </Grid>
+      }
+    </>
   )
 }
 
