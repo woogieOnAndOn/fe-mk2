@@ -114,7 +114,20 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
     const request: RequestCreateIssue = {
       issueName: issueAndCheck,
     }
-    kanbanService.insertIssue(request);
+    const response: commonModel.Message = await kanbanService.insertIssue(request);
+    if (response.msId) {
+      const returnedObject = response.msObject;
+      const insertedIssue: Issue = {
+        issueId: returnedObject.id,
+        issueName: returnedObject.issueName,
+        issueState: IssueState.WAIT,
+        useTime: 0.0,
+      };
+      let tmpIssues: Issue[] = issues;
+      tmpIssues.push(insertedIssue);
+      setIssues(tmpIssues);
+      setReset(true);
+    }
   };
 
   return (
