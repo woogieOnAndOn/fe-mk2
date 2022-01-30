@@ -56,22 +56,22 @@ const KanbanPage = () => {
             <DndProvider backend={HTML5Backend}>
               <AcceptableColumn issueState={IssueState.WAIT} labelColor={'green'} issues={issues} setIssues={setIssues} setReset={setReset} showActionBtns={showActionBtns} setShowActionBtns={setShowActionBtns} >
                 {issues.map((data, index) => (
-                  data.issueState === IssueState.WAIT && <MovableItem key={index} issue={data} showActionBtns={showActionBtns} />
+                  data.issueState === IssueState.WAIT && <MovableItem key={index} issues={issues} setIssues={setIssues} setReset={setReset} issue={data} showActionBtns={showActionBtns} />
                 ))}
               </AcceptableColumn>
               <AcceptableColumn issueState={IssueState.START} labelColor={'yellow'} issues={issues} setIssues={setIssues} setReset={setReset} showActionBtns={showActionBtns} setShowActionBtns={setShowActionBtns} >
                 {issues.map((data, index) => (
-                  data.issueState === IssueState.START && <MovableItem key={index} issue={data} showActionBtns={showActionBtns} />
+                  data.issueState === IssueState.START && <MovableItem key={index} issues={issues} setIssues={setIssues} setReset={setReset} issue={data} showActionBtns={showActionBtns} />
                 ))}
               </AcceptableColumn>
               <AcceptableColumn issueState={IssueState.COMPLETE} labelColor={'blue'} issues={issues} setIssues={setIssues} setReset={setReset} showActionBtns={showActionBtns} setShowActionBtns={setShowActionBtns} >
                 {issues.map((data, index) => (
-                  data.issueState === IssueState.COMPLETE && <MovableItem key={index} issue={data} showActionBtns={showActionBtns} />
+                  data.issueState === IssueState.COMPLETE && <MovableItem key={index} issues={issues} setIssues={setIssues} setReset={setReset} issue={data} showActionBtns={showActionBtns} />
                 ))}
               </AcceptableColumn>
               <AcceptableColumn issueState={IssueState.END} labelColor={'red'} issues={issues} setIssues={setIssues} setReset={setReset} showActionBtns={showActionBtns} setShowActionBtns={setShowActionBtns} >
                 {issues.map((data, index) => (
-                  data.issueState === IssueState.END && <MovableItem key={index} issue={data} showActionBtns={showActionBtns} />
+                  data.issueState === IssueState.END && <MovableItem key={index} issues={issues} setIssues={setIssues} setReset={setReset} issue={data} showActionBtns={showActionBtns} />
                 ))}
               </AcceptableColumn>
             </DndProvider>
