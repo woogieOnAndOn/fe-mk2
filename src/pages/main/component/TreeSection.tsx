@@ -5,15 +5,9 @@ import { TreeContext, TreeProvider } from '../../../contexts/TreeContext';
 import { TreeActionType } from '../../../reducer/tree/actions';
 import TreeService from '../../../service/tree.service';
 
-import {unified} from 'unified'
-import remarkParse from 'remark-parse'
-import remarkRehype from 'remark-rehype'
-import rehypeSanitize from 'rehype-sanitize'
-import rehypeStringify from 'rehype-stringify'
-import remarkGfm from 'remark-gfm'
-
 import { Message } from '../../../model/common.model';
 import { Tree, ActionType, TreeType, RequestUpdateSeqTree, UpDown } from '../../../model/tree.model';
+import parseMd from '../../../util/Parser.util';
 
 interface PropTypes {  }
 
@@ -196,18 +190,6 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
       alert(result.msContent);
     }
   };
-
-  const parseMd = async (contentMd: string) => {
-    const parsedText = await unified()
-      .use(remarkParse)
-      .use(remarkGfm, {singleTilde: false})
-      .use(remarkRehype)
-      .use(rehypeSanitize)
-      .use(rehypeStringify)
-      .process(contentMd);
-
-    return String(parsedText);
-  }
 
   // 액션 버튼 보이기
   const handleShowActionBtns = () => {

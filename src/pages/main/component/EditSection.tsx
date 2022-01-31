@@ -4,16 +4,10 @@ import React, { useState, useEffect, useContext } from 'react';
 import { TreeContext } from '../../../contexts/TreeContext';
 import { TreeActionType } from '../../../reducer/tree/actions';
 
-import {unified} from 'unified'
-import remarkParse from 'remark-parse'
-import remarkRehype from 'remark-rehype'
-import rehypeSanitize from 'rehype-sanitize'
-import rehypeStringify from 'rehype-stringify'
-import remarkGfm from 'remark-gfm'
-
 import TreeService from '../../../service/tree.service';
 import { RequestCreateTree, RequestUpdateTree, ActionType, TreeType, Tree } from '../../../model/tree.model';
 import { Message } from '../../../model/common.model';
+import parseMd from '../../../util/Parser.util';
 
 interface PropTypes {  }
 
@@ -93,28 +87,8 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
     }
   }
 
-  const parseMd = async (contentMd: string) => {
-    const parsedText = await unified()
-      .use(remarkParse)
-      .use(remarkGfm, {singleTilde: false})
-      .use(remarkRehype)
-      .use(rehypeSanitize)
-      .use(rehypeStringify)
-      .process(contentMd);
-
-    return String(parsedText);
-  }
-
   const parseMdAndSetPreview = async (contentMd: string) => {
-    const parsedText = await unified()
-      .use(remarkParse)
-      .use(remarkGfm, {singleTilde: false})
-      .use(remarkRehype)
-      .use(rehypeSanitize)
-      .use(rehypeStringify)
-      .process(contentMd);
-
-    document.getElementById('preview')!.innerHTML = String(parsedText);
+    document.getElementById('preview')!.innerHTML = await parseMd(contentMd);
   }
 
   useEffect(() => {
