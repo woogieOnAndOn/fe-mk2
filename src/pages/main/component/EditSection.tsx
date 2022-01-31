@@ -9,7 +9,7 @@ import markdown from "remark-parse";
 import remark2rehype from "remark-rehype";
 import html from "rehype-stringify";
 import TreeService from '../../../service/tree.service';
-import { RequestCreateTree, RequestUpdateTree, ActionType, TreeType } from '../../../model/tree.model';
+import { RequestCreateTree, RequestUpdateTree, ActionType, TreeType, Tree } from '../../../model/tree.model';
 import { Message } from '../../../model/common.model';
 
 interface PropTypes {  }
@@ -35,8 +35,9 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
 
     const result: Message = await treeService.insertTree(request);
     if (result && result.msId) {
-      setTitle('');
-      setContentMd('');
+      const insertedTree: Tree = result.msObject;
+      insertedTree.upperName = treeState.targetTree!.upperName;
+      insertedTree.upperName.push(treeState.targetTree!.name);
       treeDispatch({
         type: TreeActionType.SET_UPSERT_TREE,
         searchCondition: treeState.targetTree,
@@ -45,7 +46,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
       });
       treeDispatch({
         type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
-        targetTree: result.msObject,
+        targetTree: insertedTree,
         actionType: ActionType.READ
       });
       setTitle('');
