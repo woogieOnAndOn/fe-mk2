@@ -48,6 +48,8 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         targetTree: result.msObject,
         actionType: ActionType.READ
       });
+      setTitle('');
+      setContentMd('');
       document.getElementById('fileViewContent')!.innerHTML = String(parseMd(result.msObject.content));
     } else {
       alert(result.msContent);
@@ -113,18 +115,20 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
   useEffect(() => {
     // console.log('useEffect');
     if (treeState.actionType === ActionType.UPDATE) {
+      // console.log(ActionType.UPDATE);
       setType(treeState.targetTree!.type);
       setTitle(treeState.targetTree!.name);
       setContentMd(treeState.targetTree!.content);
       setSecret(treeState.targetTree!.secret);
     } else {
-      
+      // console.log(ActionType.CREATE);
+      setType(TreeType.FILE);
+      setTitle('');
+      setContentMd('');
+      setSecret(0);      
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [treeState.actionType]);
-
-  // console.log(title);
-  // console.log(type);
+  }, [treeState.actionType, treeState.targetTree]);
 
   return (
     <>
@@ -141,19 +145,23 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
             onChange={() => setType(TreeType.FORDER)}
           />
           <Form.Field
-              control={Radio}
-              label='파일'
-              value={TreeType.FILE}
-              disabled={treeState.actionType === ActionType.UPDATE && true}
-              checked={type === TreeType.FILE}
-              onChange={() => setType(TreeType.FILE)}
-            />
+            control={Radio}
+            label='파일'
+            value={TreeType.FILE}
+            disabled={treeState.actionType === ActionType.UPDATE && true}
+            checked={type === TreeType.FILE}
+            onChange={() => setType(TreeType.FILE)}
+          />
         </Form.Group>
 
         {/* 이름 */}
         <Form.Field>
           <label>이름</label>
-          <input placeholder='이름' defaultValue={treeState.actionType === ActionType.UPDATE ? treeState.targetTree?.name : ''} onChange={(e) => setTitle(e.target.value)} />
+          <Form.Input
+            placeholder='이름' 
+            value={title} 
+            onChange={(e) => setTitle(e.target.value)} 
+          />
         </Form.Field>
 
         {/* 내용 */}
@@ -163,7 +171,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
             label='내용'
             style={{ minHeight: 500 }}
             placeholder='내용을 입력해 주세요'
-            defaultValue={treeState.actionType === ActionType.UPDATE ? treeState.targetTree?.content : ''}
+            value={contentMd}
             onKeyPress= {(e: any) => {
               if (e.key === 'Enter' && e.ctrlKey && !e.shiftKey) {
                 if (treeState.actionType === ActionType.UPDATE) updateTree();
