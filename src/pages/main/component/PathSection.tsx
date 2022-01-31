@@ -10,7 +10,7 @@ interface PropTypes {  }
 const PathSection: React.FC<PropTypes> = (props: PropTypes) => {
   const { treeState } = useContext(TreeContext);
 
-  // console.log('path');
+  console.log(treeState.targetTree?.upperName);
 
   return (
     <Step.Group size='mini'>

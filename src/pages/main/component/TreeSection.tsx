@@ -231,7 +231,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     document.getElementById('fileViewContent')!.innerHTML = String(parseMd(data.content));
   }
 
-  const showEdit = (data: Tree, index: number) => {
+  const showEdit = (data: Tree) => {
     treeDispatch({
       type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
       targetTree: data,
@@ -280,7 +280,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
                 </Button>
                 <Button.Group basic size='mini' style={{display: treeState.showActionBtns || 'none'}}>
                   <Button icon='plus square outline' onClick={() => showCreate(data, index)} />
-                  <Button icon='edit outline' onClick={() => showEdit(data, index)} />
+                  <Button icon='edit outline' onClick={() => showEdit(data)} />
                   <Button icon='trash alternate outline' onClick={() => showDelete(data)} />
                   <Button icon='angle up' onClick={() => upTree(data)} style={{display: index === 0 && 'none'}} />
                   <Button icon='angle down' onClick={() => downTree(data)} style={{display: index === folderTotalCount-1 && 'none'}} />
@@ -294,7 +294,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
                   {data.name}
                 </Button>
                 <Button.Group basic size='mini' style={{display: treeState.showActionBtns || 'none'}}>
-                  <Button icon='edit outline' onClick={() => showEdit(data, index)} />
+                  <Button icon='edit outline' onClick={() => showEdit(data)} />
                   <Button icon='trash alternate outline' onClick={() => showDelete(data)} />
                   <Button icon='angle up' onClick={() => upTree(data)} style={{display: index === folderTotalCount && 'none'}} />
                   <Button icon='angle down' onClick={() => downTree(data)} style={{display: index === folderTotalCount+fileTotalCount-1 && 'none'}} />
