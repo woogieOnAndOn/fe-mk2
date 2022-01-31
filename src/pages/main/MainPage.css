@@ -10,6 +10,16 @@ pre {
   padding: 15px;
 }
 
+pre code {
+  display: block;
+  white-space: pre;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: scroll;
+  max-width: 100%;
+  min-width: 100px;
+  padding: 0;
+}
+
 li {
   margin-bottom: 5px;
   margin-left: -8px;
