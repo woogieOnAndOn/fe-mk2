@@ -5,10 +5,13 @@ import { TreeContext, TreeProvider } from '../../../contexts/TreeContext';
 import { TreeActionType } from '../../../reducer/tree/actions';
 import TreeService from '../../../service/tree.service';
 
-import {unified} from "unified";
-import markdown from "remark-parse";
-import remark2rehype from "remark-rehype";
-import html from "rehype-stringify";
+import {unified} from 'unified'
+import remarkParse from 'remark-parse'
+import remarkRehype from 'remark-rehype'
+import rehypeSanitize from 'rehype-sanitize'
+import rehypeStringify from 'rehype-stringify'
+import remarkGfm from 'remark-gfm'
+
 import { Message } from '../../../model/common.model';
 import { Tree, ActionType, TreeType, RequestUpdateSeqTree, UpDown } from '../../../model/tree.model';
 
@@ -194,12 +197,16 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     }
   };
 
-  const parseMd = (contentMd: string) => {
-    return unified()
-      .use(markdown)
-      .use(remark2rehype)
-      .use(html)
-      .processSync(contentMd);
+  const parseMd = async (contentMd: string) => {
+    const parsedText = await unified()
+      .use(remarkParse)
+      .use(remarkGfm, {singleTilde: false})
+      .use(remarkRehype)
+      .use(rehypeSanitize)
+      .use(rehypeStringify)
+      .process(contentMd);
+
+    return String(parsedText);
   }
 
   // 액션 버튼 보이기
@@ -211,7 +218,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
   };
 
   // 창 띄우기 
-  const showCreate = (data: Tree, index: number) => {
+  const showCreate = async (data: Tree, index: number) => {
     if (!data.upperIndex) data.upperIndex = [];
     data.upperIndex.push(index);
     treeDispatch({
@@ -219,26 +226,26 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
       targetTree: data,
       actionType: ActionType.CREATE
     });
-    document.getElementById('preview')!.innerHTML = String(parseMd(''));
+    document.getElementById('preview')!.innerHTML = await parseMd('');
   }
 
-  const showFile = (data: Tree) => {
+  const showFile = async (data: Tree) => {
     treeDispatch({
       type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
       targetTree: data,
       actionType: ActionType.READ
     });
-    document.getElementById('fileViewContent')!.innerHTML = String(parseMd(data.content));
+    document.getElementById('fileViewContent')!.innerHTML = await parseMd(data.content);
   }
 
-  const showEdit = (data: Tree) => {
+  const showEdit = async (data: Tree) => {
     treeDispatch({
       type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
       targetTree: data,
       actionType: ActionType.UPDATE
     });
 
-    document.getElementById('preview')!.innerHTML = String(parseMd(data.content));
+    document.getElementById('preview')!.innerHTML = await parseMd(data.content);
   }
 
   const showDelete = (data: Tree) => {

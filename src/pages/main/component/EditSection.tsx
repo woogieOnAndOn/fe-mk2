@@ -4,10 +4,13 @@ import React, { useState, useEffect, useContext } from 'react';
 import { TreeContext } from '../../../contexts/TreeContext';
 import { TreeActionType } from '../../../reducer/tree/actions';
 
-import {unified} from "unified";
-import markdown from "remark-parse";
-import remark2rehype from "remark-rehype";
-import html from "rehype-stringify";
+import {unified} from 'unified'
+import remarkParse from 'remark-parse'
+import remarkRehype from 'remark-rehype'
+import rehypeSanitize from 'rehype-sanitize'
+import rehypeStringify from 'rehype-stringify'
+import remarkGfm from 'remark-gfm'
+
 import TreeService from '../../../service/tree.service';
 import { RequestCreateTree, RequestUpdateTree, ActionType, TreeType, Tree } from '../../../model/tree.model';
 import { Message } from '../../../model/common.model';
@@ -49,7 +52,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
       });
       setTitle('');
       setContentMd('');
-      document.getElementById('fileViewContent')!.innerHTML = String(parseMd(result.msObject.content));
+      document.getElementById('fileViewContent')!.innerHTML = await parseMd(result.msObject.content);
     } else {
       alert(result.msContent);
     }
@@ -79,7 +82,6 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
             targetTree: result.msObject,
             actionType: ActionType.READ
           });
-          console.log(String(parseMd(result.msObject.content)));
           document.getElementById('fileViewContent')!.innerHTML = String(parseMd(result.msObject.content));
         }
       } else {
@@ -91,24 +93,28 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
     }
   }
 
-  const parseMd = (contentMd: string) => {
-    const textHtml = unified()
-      .use(markdown)
-      .use(remark2rehype)
-      .use(html)
-      .processSync(contentMd);
+  const parseMd = async (contentMd: string) => {
+    const parsedText = await unified()
+      .use(remarkParse)
+      .use(remarkGfm, {singleTilde: false})
+      .use(remarkRehype)
+      .use(rehypeSanitize)
+      .use(rehypeStringify)
+      .process(contentMd);
 
-    return textHtml;
+    return String(parsedText);
   }
 
-  const parseMdAndSetPreview = (contentMd: string) => {
-    const textHtml = unified()
-      .use(markdown)
-      .use(remark2rehype)
-      .use(html)
-      .processSync(contentMd);
+  const parseMdAndSetPreview = async (contentMd: string) => {
+    const parsedText = await unified()
+      .use(remarkParse)
+      .use(remarkGfm, {singleTilde: false})
+      .use(remarkRehype)
+      .use(rehypeSanitize)
+      .use(rehypeStringify)
+      .process(contentMd);
 
-    document.getElementById('preview')!.innerHTML = String(textHtml);
+    document.getElementById('preview')!.innerHTML = String(parsedText);
   }
 
   useEffect(() => {
