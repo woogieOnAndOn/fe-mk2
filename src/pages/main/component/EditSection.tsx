@@ -76,7 +76,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
             targetTree: result.msObject,
             actionType: ActionType.READ
           });
-          document.getElementById('fileViewContent')!.innerHTML = String(parseMd(result.msObject.content));
+          document.getElementById('fileViewContent')!.innerHTML = await parseMd(result.msObject.content);
         }
       } else {
         alert(result.msContent);
