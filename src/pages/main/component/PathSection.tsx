@@ -26,7 +26,7 @@ const PathSection: React.FC<PropTypes> = (props: PropTypes) => {
           </Step.Content>
         </Step>
       ))}
-      {treeState.targetTree?.name !== 'user' && treeState.targetTree?.name !== '' && 
+      {treeState.targetTree?.name !== '' && 
         <Step active>
           {
             {

@@ -36,8 +36,6 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
     const result: Message = await treeService.insertTree(request);
     if (result && result.msId) {
       const insertedTree: Tree = result.msObject;
-      insertedTree.upperName = treeState.targetTree!.upperName;
-      insertedTree.upperName.push(treeState.targetTree!.name);
       treeDispatch({
         type: TreeActionType.SET_UPSERT_TREE,
         searchCondition: treeState.targetTree,
