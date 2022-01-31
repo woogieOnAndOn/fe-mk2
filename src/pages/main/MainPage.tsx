@@ -20,6 +20,9 @@ const MainPage: React.FC = (): ReactElement => {
 
   return (
     <Container fluid>
+      {/* 파일경로 */}
+      <PathSection />
+      
       <Grid stackable columns={2}>
         <Grid.Column width={6}>
           <Segment>
@@ -29,8 +32,6 @@ const MainPage: React.FC = (): ReactElement => {
         </Grid.Column>
           <Grid.Column width={10}>
             <Segment>
-              {/* 파일경로 */}
-              <PathSection />
 
               {/* 작성 & 수정 */}
               <EditSection />
