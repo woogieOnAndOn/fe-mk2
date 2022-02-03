@@ -158,10 +158,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
           />
         </Form.Field>
 
-        <Form.Group inline>
-          <Form.Input type='file' multiple="multiple" onChange={handleChangeFile} accept='image/*' />
-          <Button color='orange' type='submit' content='업로드' />
-        </Form.Group>
+        <Form.Input type='file' multiple="multiple" onChange={handleChangeFile} accept='image/*' />
 
         {/* 내용 */}
         {type === TreeType.FILE &&
