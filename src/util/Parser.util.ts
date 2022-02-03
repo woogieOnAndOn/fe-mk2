@@ -22,7 +22,7 @@ const parseMd = async (contentMd: string) => {
     .use(rehypeStringify)
     .process(contentMd);
 
-  console.log(String(parsedText));
+  // console.log(String(parsedText));
   return String(parsedText);
 }
 

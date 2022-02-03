@@ -19,7 +19,6 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
   const [title, setTitle] = useState<string>('');
   const [contentMd, setContentMd] = useState<string>('');
   const [secret, setSecret] = useState<number>(0);
-  const [imgFile, setImgFile] = useState(null);
 
   const insertTree = async () => {
     const request: RequestCreateTree = {
@@ -99,9 +98,9 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
       formData.append("files", file);
     }
     const result: {paths: string[]} = await treeService.uploadFile(formData);
-    let htmlString = '';
+    let htmlString = '\n';
     for (let path of result.paths) {
-      htmlString += `<Image src='${path}' rounded fluid /> \n`;
+      htmlString += `<img src='${path}'/> \n`;
     }
     setContentMd(contentMd + htmlString);
     parseMdAndSetPreview(contentMd + htmlString);
