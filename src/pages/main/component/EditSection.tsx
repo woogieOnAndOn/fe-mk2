@@ -19,6 +19,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
   const [title, setTitle] = useState<string>('');
   const [contentMd, setContentMd] = useState<string>('');
   const [secret, setSecret] = useState<number>(0);
+  const [imgFile, setImgFile] = useState(null);
 
   const insertTree = async () => {
     const request: RequestCreateTree = {
@@ -91,6 +92,21 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
     document.getElementById('preview')!.innerHTML = await parseMd(contentMd);
   }
 
+  const handleChangeFile = async (event: any) => {
+    const formData = new FormData();
+    const filesData = event.target.files;
+    for (let file of filesData) {
+      formData.append("files", file);
+    }
+    const result: {paths: string[]} = await treeService.uploadFile(formData);
+    let htmlString = '';
+    for (let path of result.paths) {
+      htmlString += `<Image src='${path}' rounded fluid /> \n`;
+    }
+    setContentMd(contentMd + htmlString);
+    parseMdAndSetPreview(contentMd + htmlString);
+  }
+
   useEffect(() => {
     // console.log('useEffect');
     if (treeState.actionType === ActionType.UPDATE) {
@@ -142,6 +158,11 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
             onChange={(e) => setTitle(e.target.value)} 
           />
         </Form.Field>
+
+        <Form.Group inline>
+          <Form.Input type='file' multiple="multiple" onChange={handleChangeFile} accept='image/*' />
+          <Button color='orange' type='submit' content='업로드' />
+        </Form.Group>
 
         {/* 내용 */}
         {type === TreeType.FILE &&

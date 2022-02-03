@@ -22,4 +22,8 @@ export default class CommonService {
     this.config.data = requestBody;
     return await axios.request(this.config);
   }
+
+  public async callApiForUpload(method: Method, endPoint: string, params?: any, requestBody?: any): Promise<any> {
+    return await axios.post(`${this.apiUrl}${endPoint}`, requestBody, {headers: { 'Content-Type': 'multipart/form-data' }});
+  }
 }

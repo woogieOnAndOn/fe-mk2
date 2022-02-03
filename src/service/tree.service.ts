@@ -27,4 +27,9 @@ export default class TreeService extends CommonService {
     const response = await this.callApi('PUT', `/tree/${request.id}/seq`, null, request);
     return response.status === 200 ? response.data : null;
   }
+
+  async uploadFile<T>(request: any): Promise<T> {
+    const response = await this.callApiForUpload('POST', `/upload`, null, request);
+    return response.status === 200 ? response.data : null;
+  }
 }
