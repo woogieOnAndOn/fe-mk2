@@ -135,18 +135,21 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
     <Grid.Column style={{marginTop: '15px', marginLeft: issueState === IssueState.WAIT && '20px', marginRight: issueState === IssueState.END && '20px'}}>
       <Segment>
 
+        {/* 컬럼 깃발 */}
         <Label as='a' color={labelColor} ribbon onClick={() => setShowActionBtns(!showActionBtns)} >
           {issueState}
         </Label>
 
-        {showActionBtns && issueState === IssueState.WAIT &&
+        {/* 추가 버튼 */}
+        {issueState === IssueState.WAIT &&
           <Button.Group basic size='mini' >
             <Button icon='plus square outline' onClick={() => setShowCreateForm(!showCreateForm)} />
           </Button.Group>
         }
 
         <div ref={drop} style={{ minHeight: '500px', marginTop: '10px' }}>
-        
+
+          {/* 텍스트 입력 창 */}
           {showCreateForm && issueState === IssueState.WAIT &&
             <Form style={{margin: '20px 0px'}}>
               <Form.Field 
@@ -165,7 +168,9 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
             </Form>
           }
 
+          {/* 이슈 */}
           {children}
+
         </div>
       </Segment>
     </Grid.Column>
