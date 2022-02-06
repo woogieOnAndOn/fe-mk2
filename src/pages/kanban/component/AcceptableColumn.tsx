@@ -125,6 +125,7 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
       };
       let tmpIssues: Issue[] = issues;
       tmpIssues.push(insertedIssue);
+      setIssueAndCheck('');
       setIssues(tmpIssues);
       setReset(true);
     }
@@ -150,6 +151,7 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
             <Form style={{margin: '20px 0px'}}>
               <Form.Field 
                 control={TextArea} 
+                value={issueAndCheck}
                 style={{minHeight: 200}}
                 onKeyPress= {(e: any) => {
                   if (e.key === 'Enter' && e.ctrlKey) {
