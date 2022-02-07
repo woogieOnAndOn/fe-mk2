@@ -10,10 +10,17 @@ pre {
   padding: 15px;
 }
 
-pre code {
+pre > code {
   display: block;
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;
+}
+
+p > code {
+  background-color: #f5f5f5;
+  font-weight: bold;
+  padding: 3px;
+  border-radius: 5px;
 }
 
 li {
