@@ -19,3 +19,23 @@ export const findAndUpdateTree = (trees: Tree[], targetTree: Tree): Tree[] => {
     return trees;
   }
 }
+
+export const findTreeById = (trees: Tree[], targetId: number): Tree | null => {
+  let find = false;
+  for (let i = 0; i < trees.length; i ++) {
+    if (trees[i].id === targetId) {
+      find = true;
+      return trees[i];
+    }
+  }
+
+  if (!find) {
+    for (let tree of trees) {
+      if (tree.children) {
+        return findTreeById(tree.children, targetId);
+      }
+    }
+  }
+
+  return null;
+}

@@ -8,7 +8,7 @@ import TreeService from '../../../service/tree.service';
 import { Message } from '../../../model/common.model';
 import { Tree, ActionType, TreeType, RequestUpdateSeqTree, UpDown, TreeSearchCondition } from '../../../model/tree.model';
 import parseMd from '../../../util/Parser.util';
-import { findAndUpdateTree } from '../../../util/Tree.util';
+import { findAndUpdateTree, findTreeById } from '../../../util/Tree.util';
 
 interface PropTypes {  }
 
@@ -30,7 +30,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     upperName: [],
   };
 
-  const showDirectories = (async (data: Tree, index: number) => {
+  const showDirectories = (async (data: Tree) => {
     const newSearchCondition: TreeSearchCondition = {
       depth: data.depth + 1,
       parent: data.id,
@@ -73,8 +73,12 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
 
     const result: Message = await treeService.deleteTree(request);
     if (result && result.msId) {
-      if (data.upperIndex) {
-        showDirectories(data.parent, data.upperIndex[data.upperIndex.length-1]);
+
+      const parentTree: Tree | null = findTreeById(treeState.datas, data.parent);
+
+      if (parentTree) {
+        console.log(parentTree);
+        showDirectories(parentTree);
       } else {
         retrieveTree({})
           .then(response => {
@@ -101,7 +105,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     const result: Message = await treeService.updateSeqTree(request);
     if (result && result.msId) {
       if (data.upperIndex) {
-        showDirectories(data.parent, data.upperIndex[data.upperIndex.length-1]);
+        showDirectories(data.parent);
       } else {
         retrieveTree({})
           .then(response => {
@@ -128,7 +132,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     const result: Message = await treeService.updateSeqTree(request);
     if (result && result.msId) {
       if (data.upperIndex) {
-        showDirectories(data.parent, data.upperIndex[data.upperIndex.length-1]);
+        showDirectories(data.parent);
       } else {
         retrieveTree({})
           .then(response => {
@@ -195,7 +199,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
 
   useEffect(() => {
     // console.log('useEffect');
-    showDirectories(treeState.searchCondition, treeState.searchIndex);
+    showDirectories(treeState.searchCondition);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [treeState.upsertTree]);
 
@@ -215,7 +219,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
           {
             [TreeType.FORDER]:
               <div> 
-                <Button color='orange' onClick={() => showDirectories(data, index)}>
+                <Button color='orange' onClick={() => showDirectories(data)}>
                   <Icon name='folder open outline' />
                   {data.name}
                 </Button>
