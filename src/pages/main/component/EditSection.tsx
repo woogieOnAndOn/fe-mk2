@@ -8,6 +8,7 @@ import TreeService from '../../../service/tree.service';
 import { RequestCreateTree, RequestUpdateTree, ActionType, TreeType, Tree } from '../../../model/tree.model';
 import { Message } from '../../../model/common.model';
 import parseMd from '../../../util/Parser.util';
+import { findAndUpdateTree } from '../../../util/Tree.util';
 
 interface PropTypes {  }
 
@@ -82,11 +83,13 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
       const result: Message = await treeService.updateTree(request);
       if (result && result.msId) {
         alert(result.msContent);
+        let tmpState: Tree[] = treeState.datas;
+        const updatedTrees: Tree[] = findAndUpdateTree(tmpState, result.msObject);
+        console.log(updatedTrees);
+        
         treeDispatch({
-          type: TreeActionType.SET_UPSERT_TREE,
-          searchCondition: treeState.targetTree?.parent,
-          searchIndex: treeState.targetTree!.upperIndex[treeState.targetTree!.upperIndex.length-1],
-          upsertTree: request,
+          type: TreeActionType.SET_SEARCH_RESULT,
+          datas: updatedTrees
         });
         if (afterType === 'finish') {
           treeDispatch({

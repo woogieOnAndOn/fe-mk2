@@ -6,8 +6,9 @@ import { TreeActionType } from '../../../reducer/tree/actions';
 import TreeService from '../../../service/tree.service';
 
 import { Message } from '../../../model/common.model';
-import { Tree, ActionType, TreeType, RequestUpdateSeqTree, UpDown } from '../../../model/tree.model';
+import { Tree, ActionType, TreeType, RequestUpdateSeqTree, UpDown, TreeSearchCondition } from '../../../model/tree.model';
 import parseMd from '../../../util/Parser.util';
+import { findAndUpdateTree } from '../../../util/Tree.util';
 
 interface PropTypes {  }
 
@@ -30,75 +31,20 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
   };
 
   const showDirectories = (async (data: Tree, index: number) => {
-    // console.log(data);
-    // console.log(index);
-
-    const newSearchCondition = {
+    const newSearchCondition: TreeSearchCondition = {
       depth: data.depth + 1,
       parent: data.id,
       secret: 0,
     };
     retrieveTree(newSearchCondition)
       .then(response => {
-        // console.log(response);
         data.children = response;
         let tmpState: Tree[] = treeState.datas;
-        const children: Tree[] = response;
-        let chd;
-        if (children && children.length) {
-          for (let child of children) {
-            child.parentId = child.parent;
-            child.parent = {
-              id: data.id,
-              type: data.type,
-              name: data.name,
-              depth: data.depth,
-              parent: data.parent,
-              secret: data.secret,
-              children: [],
-              upperIndex: data.upperIndex
-            };
-
-            child.upperIndex = [];
-            if (data.upperIndex && data.upperIndex.length) {
-              for (let beforeIndex of data.upperIndex) {
-                child.upperIndex.push(beforeIndex);
-              }
-            }
-            if (data.depth !== 0) child.upperIndex.push(index);
-
-            child.upperName = [];
-            if (data.upperName && data.upperName.length) {
-              for (let beforeName of data.upperName) {
-                child.upperName.push(beforeName);
-              }
-            }
-            if (data.depth !== 0) child.upperName.push(data.name);
-          }
-          chd = children[0];
-
-          try {
-            switch(data.depth){
-              case 0: tmpState = children; break;
-              case 1: tmpState[chd.upperIndex[0]].children = children; break;
-              case 2: tmpState[chd.upperIndex[0]].children[chd.upperIndex[1]].children = children; break;
-              case 3: tmpState[chd.upperIndex[0]].children[chd.upperIndex[1]].children[chd.upperIndex[2]].children = children; break;
-              case 4: tmpState[chd.upperIndex[0]].children[chd.upperIndex[1]].children[chd.upperIndex[2]].children[chd.upperIndex[3]].children = children; break;
-              case 5: tmpState[chd.upperIndex[0]].children[chd.upperIndex[1]].children[chd.upperIndex[2]].children[chd.upperIndex[3]].children[chd.upperIndex[4]].children = children; break;
-              case 6: tmpState[chd.upperIndex[0]].children[chd.upperIndex[1]].children[chd.upperIndex[2]].children[chd.upperIndex[3]].children[chd.upperIndex[4]].children[chd.upperIndex[5]].children = children; break;
-              case 7: tmpState[chd.upperIndex[0]].children[chd.upperIndex[1]].children[chd.upperIndex[2]].children[chd.upperIndex[3]].children[chd.upperIndex[4]].children[chd.upperIndex[5]].children[chd.upperIndex[6]].children = children; break;
-              case 8: tmpState[chd.upperIndex[0]].children[chd.upperIndex[1]].children[chd.upperIndex[2]].children[chd.upperIndex[3]].children[chd.upperIndex[4]].children[chd.upperIndex[5]].children[chd.upperIndex[6]].children[chd.upperIndex[7]].children = children; break;
-              case 9: tmpState[chd.upperIndex[0]].children[chd.upperIndex[1]].children[chd.upperIndex[2]].children[chd.upperIndex[3]].children[chd.upperIndex[4]].children[chd.upperIndex[5]].children[chd.upperIndex[6]].children[chd.upperIndex[7]].children[chd.upperIndex[8]].children = children; break;
-              default: break;
-            }
-          } catch (error) {
-            window.location.reload();
-          }
-
-        }
+        const updatedTrees: Tree[] = findAndUpdateTree(tmpState, data);
+        
         treeDispatch({
           type: TreeActionType.SET_SEARCH_RESULT,
-          datas: tmpState
+          datas: updatedTrees
         });
       });
   });
@@ -251,6 +197,8 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
   type myType = { data: Tree, index: number, folderTotalCount: number, fileTotalCount: number};
   const RecursiveComponent = ({data, index, folderTotalCount, fileTotalCount}: myType) => {
     const hasChildren = data.children ? true : false;
+    console.log(data);
+    console.log(hasChildren);
     let childFolderTotalCount = 0;
     let childFileTotalCount = 0;
     if (hasChildren) {
