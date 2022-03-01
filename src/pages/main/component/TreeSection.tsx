@@ -22,7 +22,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     name: '',
     content: '',
     depth: 0,
-    parent: {},
+    parent: 0,
     secret: 0,
     children: [],
   };
@@ -155,7 +155,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
   };
 
   // 창 띄우기 
-  const showCreate = async (data: Tree, index: number) => {
+  const showCreate = async (data: Tree) => {
     treeDispatch({
       type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
       targetTree: data,
@@ -221,7 +221,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
                   {data.name}
                 </Button>
                 <Button.Group basic size='mini' style={{display: treeState.showActionBtns || 'none'}}>
-                  <Button icon='plus square outline' onClick={() => showCreate(data, index)} />
+                  <Button icon='plus square outline' onClick={() => showCreate(data)} />
                   <Button icon='edit outline' onClick={() => showEdit(data)} />
                   <Button icon='trash alternate outline' onClick={() => showDelete(data)} />
                   <Button icon='angle up' onClick={() => upTree(data)} style={{display: index === 0 && 'none'}} />
@@ -274,7 +274,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
         user
       </Button>
       <Button.Group basic size='mini' style={{display: treeState.showActionBtns || 'none'}}>
-        <Button icon='plus square outline' onClick={() => showCreate(initialTree, 0)} />
+        <Button icon='plus square outline' onClick={() => showCreate(initialTree)} />
       </Button.Group>
       {treeState.datas && treeState.datas!.map((data, index) => (
         <RecursiveComponent key={index} data={data} index={index} folderTotalCount={folderTotalCount} fileTotalCount={fileTotalCount}/>

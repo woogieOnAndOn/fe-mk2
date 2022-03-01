@@ -32,7 +32,10 @@ export const findTreeById = (trees: Tree[], targetId: number): Tree | null => {
   if (!find) {
     for (let tree of trees) {
       if (tree.children) {
-        return findTreeById(tree.children, targetId);
+        const result: Tree | null = findTreeById(tree.children, targetId);
+        if (result) {
+          return result;
+        }
       }
     }
   }
@@ -40,24 +43,25 @@ export const findTreeById = (trees: Tree[], targetId: number): Tree | null => {
   return null;
 }
 
-export const findTreePathById = (trees: Tree[], targetId: number, pastPath: string[] = []): string[] => {
-  let find = false;
-  let paths: string[] = pastPath;
-  for (let i = 0; i < trees.length; i ++) {
-    if (trees[i].id === targetId) {
-      find = true;
-    }
+export const findTreePathById = (trees: Tree[], targetId: number): string[] => {
+  const paths: string[] = [];
+  const targetTree: Tree | null = findTreeById(trees, targetId);
+
+  if (!targetTree) {
+    return [];
   }
 
-  if (!find) {
-    for (let tree of trees) {
-      if (tree.children) {
-        paths.push(tree.name);
-        const foundPath: string[] = findTreePathById(tree.children, targetId, paths);
-        paths.concat(foundPath);
-      }
-    }
-  }
+  let depth = targetTree.depth;
+  let parentId = targetTree.parent;
 
+  while(depth > 0) {
+    const parentTree: Tree | null = findTreeById(trees, parentId);
+    if (!parentTree) break;
+
+    paths.unshift(parentTree.name);
+    depth -= 1;
+    parentId = parentTree.parent;
+  }
+  
   return paths;
 }

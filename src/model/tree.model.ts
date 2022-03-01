@@ -4,7 +4,7 @@ export interface Tree {
   name        :string;
   content     :string;
   depth       :number;
-  parent      :any;
+  parent      :number;
   secret      :number;          // 0: piblic, 1: private
   children    :Tree[];
 }
