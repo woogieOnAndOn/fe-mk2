@@ -47,17 +47,23 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
     const result: Message = await treeService.insertTree(request);
     if (result && result.msId) {
       const insertedTree: Tree = result.msObject;
+
+      const targetTree: Tree = treeState.targetTree!;
+      targetTree.children = [...targetTree.children, insertedTree];
+      let tmpState: Tree[] = treeState.datas;
+      const updatedTrees: Tree[] = findAndUpdateTree(tmpState, targetTree);
+      
       treeDispatch({
-        type: TreeActionType.SET_UPSERT_TREE,
-        searchCondition: treeState.targetTree,
-        searchIndex: treeState.targetTree!.upperIndex[treeState.targetTree!.upperIndex.length-1],
-        upsertTree: request,
+        type: TreeActionType.SET_SEARCH_RESULT,
+        datas: updatedTrees
       });
+
       treeDispatch({
         type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
         targetTree: insertedTree,
         actionType: ActionType.READ
       });
+      
       setInputs({
         ...inputs,
         title: '',
@@ -85,7 +91,6 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         alert(result.msContent);
         let tmpState: Tree[] = treeState.datas;
         const updatedTrees: Tree[] = findAndUpdateTree(tmpState, result.msObject);
-        console.log(updatedTrees);
         
         treeDispatch({
           type: TreeActionType.SET_SEARCH_RESULT,
