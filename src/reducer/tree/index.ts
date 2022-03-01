@@ -4,9 +4,17 @@ import { ActionType } from '../../model/tree.model';
 
 export const initialState: TreeState = {
   searchCondition: {
+    id: 0,
+    type: 20,
+    name: '',
+    content: '',
     depth: 0,
     parent: 0,
+    parentId: 0,
     secret: 0,
+    children: [],
+    upperIndex: [],
+    upperName: [],
   },
   searchIndex: 0,
   datas: [],

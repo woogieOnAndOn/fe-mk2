@@ -1,7 +1,7 @@
-import { Tree, TreeSearchCondition, ActionType } from "../../model/tree.model";
+import { Tree, ActionType } from "../../model/tree.model";
 
 export interface TreeState {
-  searchCondition: TreeSearchCondition;
+  searchCondition: Tree;
   searchIndex: number;
   datas: Tree[];
   showActionBtns: boolean;

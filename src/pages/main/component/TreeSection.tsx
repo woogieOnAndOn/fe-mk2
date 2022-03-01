@@ -29,7 +29,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     upperName: [],
   };
 
-  const showDirectories = (async (data: any, index: number) => {
+  const showDirectories = (async (data: Tree, index: number) => {
     // console.log(data);
     // console.log(index);
 
@@ -41,8 +41,9 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     retrieveTree(newSearchCondition)
       .then(response => {
         // console.log(response);
-        let tmpState: any = treeState.datas;
-        const children: any = response;
+        data.children = response;
+        let tmpState: Tree[] = treeState.datas;
+        const children: Tree[] = response;
         let chd;
         if (children && children.length) {
           for (let child of children) {

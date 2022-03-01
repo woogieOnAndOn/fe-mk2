@@ -1,4 +1,4 @@
-import { Tree, TreeSearchCondition, ActionType } from "../../model/tree.model";
+import { Tree, ActionType } from "../../model/tree.model";
 
 export enum TreeActionType {
   SET_SEARCH_CONDITION = 'SET_SEARCH_CONDITION',
@@ -11,7 +11,7 @@ export enum TreeActionType {
 
 export type TreeAction = {
   type: TreeActionType;
-  searchCondition: TreeSearchCondition;
+  searchCondition: Tree;
   searchIndex: number;
   datas: Tree[];
   showActionBtns: boolean;
