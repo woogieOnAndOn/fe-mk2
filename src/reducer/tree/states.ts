@@ -6,6 +6,6 @@ export interface TreeState {
   datas: Tree[];
   showActionBtns: boolean;
   actionType: ActionType;
-  targetTree?: Tree;
+  targetTree: Tree;
   upsertTree: Tree;
 }

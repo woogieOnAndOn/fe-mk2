@@ -39,8 +39,8 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
       type: type,
       name: title,
       content: contentMd,
-      depth: treeState.targetTree!.depth + 1 || 1,
-      parent: treeState.targetTree!.id || 0,
+      depth: treeState.targetTree.depth + 1 || 1,
+      parent: treeState.targetTree.id || 0,
       secret: secret,
     };
 
@@ -75,7 +75,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
   const updateTree = async (afterType= 'continue') => {
     try {
       const request: RequestUpdateTree = {
-        id: treeState.targetTree!.id,
+        id: treeState.targetTree.id,
         name: title,
         content: contentMd,
         secret: secret,
@@ -136,11 +136,11 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
       // console.log(ActionType.UPDATE);
       setInputs({
         ...inputs,
-        title: treeState.targetTree!.name,
-        contentMd: treeState.targetTree!.content,
-        secret: treeState.targetTree!.secret,
+        title: treeState.targetTree.name,
+        contentMd: treeState.targetTree.content,
+        secret: treeState.targetTree.secret,
       });
-      setType(treeState.targetTree!.type);
+      setType(treeState.targetTree.type);
     } else {
       // console.log(ActionType.CREATE);
       setInputs({
