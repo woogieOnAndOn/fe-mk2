@@ -18,14 +18,14 @@ const PathSection: React.FC<PropTypes> = (props: PropTypes) => {
           <Step.Title>user</Step.Title>
         </Step.Content>
       </Step>
-      {treeState.targetTree?.upperName && treeState.targetTree?.upperName.map((data, index) => (
+      {/* {treeState.targetTree?.upperName && treeState.targetTree?.upperName.map((data, index) => (
         <Step key={index}>
           <Icon name='folder open outline' />
           <Step.Content>
             <Step.Title>{data}</Step.Title>
           </Step.Content>
         </Step>
-      ))}
+      ))} */}
       {treeState.targetTree?.name !== '' && 
         <Step active>
           {

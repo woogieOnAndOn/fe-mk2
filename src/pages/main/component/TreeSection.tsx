@@ -23,11 +23,8 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     content: '',
     depth: 0,
     parent: {},
-    parentId: 0,
     secret: 0,
     children: [],
-    upperIndex: [],
-    upperName: [],
   };
 
   const showDirectories = (async (data: Tree) => {

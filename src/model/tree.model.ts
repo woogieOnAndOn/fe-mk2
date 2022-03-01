@@ -5,11 +5,8 @@ export interface Tree {
   content     :string;
   depth       :number;
   parent      :any;
-  parentId    :number;
   secret      :number;          // 0: piblic, 1: private
   children    :Tree[];
-  upperIndex  :number[];
-  upperName   :string[];
 }
 
 export interface TreeSearchCondition {

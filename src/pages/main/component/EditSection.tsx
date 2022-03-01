@@ -50,7 +50,6 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
       treeDispatch({
         type: TreeActionType.SET_UPSERT_TREE,
         searchCondition: treeState.targetTree,
-        searchIndex: treeState.targetTree!.upperIndex[treeState.targetTree!.upperIndex.length-1],
         upsertTree: request,
       });
 
