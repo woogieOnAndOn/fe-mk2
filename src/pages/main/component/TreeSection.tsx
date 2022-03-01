@@ -38,9 +38,14 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     };
     retrieveTree(newSearchCondition)
       .then(response => {
-        data.children = response;
-        let tmpState: Tree[] = treeState.datas;
-        const updatedTrees: Tree[] = findAndUpdateTree(tmpState, data);
+        let updatedTrees: Tree[] = [];
+        if (newSearchCondition.depth === 1) {
+          updatedTrees = response;
+        } else {
+          data.children = response;
+          let tmpState: Tree[] = treeState.datas;
+          updatedTrees = findAndUpdateTree(tmpState, data);
+        }
         
         treeDispatch({
           type: TreeActionType.SET_SEARCH_RESULT,
@@ -197,8 +202,6 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
   type myType = { data: Tree, index: number, folderTotalCount: number, fileTotalCount: number};
   const RecursiveComponent = ({data, index, folderTotalCount, fileTotalCount}: myType) => {
     const hasChildren = data.children ? true : false;
-    console.log(data);
-    console.log(hasChildren);
     let childFolderTotalCount = 0;
     let childFileTotalCount = 0;
     if (hasChildren) {
