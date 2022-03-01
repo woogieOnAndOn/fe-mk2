@@ -73,11 +73,9 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
 
     const result: Message = await treeService.deleteTree(request);
     if (result && result.msId) {
-
       const parentTree: Tree | null = findTreeById(treeState.datas, data.parent);
 
       if (parentTree) {
-        console.log(parentTree);
         showDirectories(parentTree);
       } else {
         retrieveTree({})
@@ -98,14 +96,16 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
       id: data.id,
       type: data.type,
       depth: data.depth,
-      parent: data.parentId,
+      parent: data.parent,
       upDown: UpDown.UP,
     }
 
     const result: Message = await treeService.updateSeqTree(request);
     if (result && result.msId) {
-      if (data.upperIndex) {
-        showDirectories(data.parent);
+      const parentTree: Tree | null = findTreeById(treeState.datas, data.parent);
+
+      if (parentTree) {
+        showDirectories(parentTree);
       } else {
         retrieveTree({})
           .then(response => {
@@ -125,14 +125,16 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
       id: data.id,
       type: data.type,
       depth: data.depth,
-      parent: data.parentId,
+      parent: data.parent,
       upDown: UpDown.DOWN,
     }
 
     const result: Message = await treeService.updateSeqTree(request);
     if (result && result.msId) {
-      if (data.upperIndex) {
-        showDirectories(data.parent);
+      const parentTree: Tree | null = findTreeById(treeState.datas, data.parent);
+
+      if (parentTree) {
+        showDirectories(parentTree);
       } else {
         retrieveTree({})
           .then(response => {
@@ -157,8 +159,6 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
 
   // 창 띄우기 
   const showCreate = async (data: Tree, index: number) => {
-    if (!data.upperIndex) data.upperIndex = [];
-    data.upperIndex.push(index);
     treeDispatch({
       type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
       targetTree: data,
