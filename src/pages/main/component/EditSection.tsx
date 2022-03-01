@@ -15,10 +15,23 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
   const { treeState, treeDispatch } = useContext(TreeContext);
   const treeService = new TreeService();
 
+  const [inputs, setInputs] = useState({
+    title: '',
+    contentMd: '',
+    secret: 0,
+  });
+
+  const {title, contentMd, secret} = inputs;
+
+  const handleOnChange = (e: any) => {
+    const { name, value } = e.target;
+    setInputs({
+      ...inputs,
+      [name]: value
+    });
+  }
+
   const [type, setType] = useState<number>(TreeType.FILE);
-  const [title, setTitle] = useState<string>('');
-  const [contentMd, setContentMd] = useState<string>('');
-  const [secret, setSecret] = useState<number>(0);
 
   const insertTree = async () => {
     const request: RequestCreateTree = {
@@ -44,8 +57,13 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         targetTree: insertedTree,
         actionType: ActionType.READ
       });
-      setTitle('');
-      setContentMd('');
+      setInputs({
+        ...inputs,
+        title: '',
+        contentMd: '',
+      });
+      // setTitle('');
+      // setContentMd('');
       document.getElementById('fileViewContent')!.innerHTML = await parseMd(result.msObject.content);
     } else {
       alert(result.msContent);
@@ -102,7 +120,10 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
     for (let path of result.paths) {
       htmlString += `<img src='${path}'/> \n`;
     }
-    setContentMd(contentMd + htmlString);
+    setInputs({
+      ...inputs,
+      contentMd: contentMd + htmlString
+    });
     parseMdAndSetPreview(contentMd + htmlString);
   }
 
@@ -110,16 +131,22 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
     // console.log('useEffect');
     if (treeState.actionType === ActionType.UPDATE) {
       // console.log(ActionType.UPDATE);
+      setInputs({
+        ...inputs,
+        title: treeState.targetTree!.name,
+        contentMd: treeState.targetTree!.content,
+        secret: treeState.targetTree!.secret,
+      });
       setType(treeState.targetTree!.type);
-      setTitle(treeState.targetTree!.name);
-      setContentMd(treeState.targetTree!.content);
-      setSecret(treeState.targetTree!.secret);
     } else {
       // console.log(ActionType.CREATE);
+      setInputs({
+        ...inputs,
+        title: '',
+        contentMd: '',
+        secret: 0,
+      });
       setType(TreeType.FILE);
-      setTitle('');
-      setContentMd('');
-      setSecret(0);      
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [treeState.actionType, treeState.targetTree]);
@@ -152,9 +179,10 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         <Form.Field>
           <label>이름</label>
           <Form.Input
+            name='title'
             placeholder='이름' 
             value={title} 
-            onChange={(e) => setTitle(e.target.value)} 
+            onChange={handleOnChange} 
           />
         </Form.Field>
 
@@ -166,6 +194,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         {/* 내용 */}
         {type === TreeType.FILE &&
           <Form.Field
+            name='contentMd'
             control={TextArea}
             label='내용'
             style={{ minHeight: 500 }}
@@ -180,7 +209,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
               }
             }}
             onChange={(e: any) => {
-              setContentMd(e.target.value);
+              handleOnChange(e);
               parseMdAndSetPreview(e.target.value);
             }}
           />
