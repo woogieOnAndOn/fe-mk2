@@ -54,3 +54,22 @@ img {
   border-radius: 5px;
   margin-bottom: 10px;
 }
+
+a.float {
+  font-size: xx-large;
+	position:fixed;
+  height:40px;
+	width:40px;
+  top:20px;
+  opacity: 0.3;
+	background-color:#0C9;
+	color:#FFF;
+	border-radius:50px;
+	box-shadow: 2px 2px 3px #999;
+  z-index: 1;
+}
+
+a.expand {
+  right: 40px;
+  padding: 10px 0px 0px 1.5px;
+}

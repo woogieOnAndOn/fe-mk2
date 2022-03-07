@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 import './MainPage.css';
@@ -15,33 +16,40 @@ import { useContext } from 'react';
 
 const MainPage: React.FC = (): ReactElement => {
   const { treeState, treeDispatch } = useContext(TreeContext);
-
-  // console.log('main');
+  const [divided, setDivided] = useState<boolean>(true);
 
   return (
     <Container fluid>
+      <a className={'float expand'} onClick={() => {
+        setDivided(divided => {return !divided});
+      }}>
+        <Icon className={'arrows alternate horizontal'} />
+      </a>
+      
       {/* 파일경로 */}
       <PathSection />
       
       <Grid stackable columns={2}>
         <Grid.Column width={6}>
+          <div style={{display: divided ? 'block' : 'none'}}>
+            <Segment>
+              {/* 디렉토리 */}
+              <TreeSection/>
+            </Segment>
+          </div>
+        </Grid.Column>
+        <Grid.Column width={divided ? 10 : 16}>
           <Segment>
-            {/* 디렉토리 */}
-            <TreeSection/>
+
+            {/* 작성 & 수정 */}
+            <EditSection />
+
+            {/* 파일 조회 뷰 */}
+            <div className='fileView' style={{display: treeState.actionType !== ActionType.READ ? 'none' : 'block'}}>
+              <div id='fileViewContent'></div>
+            </div>
           </Segment>
         </Grid.Column>
-          <Grid.Column width={10}>
-            <Segment>
-
-              {/* 작성 & 수정 */}
-              <EditSection />
-
-              {/* 파일 조회 뷰 */}
-              <div className='fileView' style={{display: treeState.actionType !== ActionType.READ ? 'none' : 'block'}}>
-                <div id='fileViewContent'></div>
-              </div>
-            </Segment>
-          </Grid.Column>
       </Grid>
     </Container>
   );
