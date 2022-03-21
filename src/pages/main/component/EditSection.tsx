@@ -229,7 +229,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         : 
           <Button color='green' type='submit' onClick={(e) => {
             e.preventDefault();
-            updateTree();
+            updateTree('finish');
           }} >
             수정
           </Button>
