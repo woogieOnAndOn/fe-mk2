@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 import './MainPage.css';
-import React, { useState, useEffect, ReactElement } from 'react';
+import React, { useState, useEffect, ReactElement, useRef } from 'react';
 import { Icon, Button, Container, Checkbox, Form, Input, Radio, Select, TextArea, Grid, Image, Segment, Step, Card } from 'semantic-ui-react'
 
 import { TreeContext, TreeProvider } from '../../contexts/TreeContext';
@@ -20,6 +20,7 @@ const MainPage: React.FC = (): ReactElement => {
   const { treeState, treeDispatch } = useContext(TreeContext);
   const [divided, setDivided] = useState<boolean>(true);
   const [contentHtml, setContentHtml] = useState<string>('');
+  const editSection = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const asyncParseMd = async (data: string) => {
@@ -29,6 +30,8 @@ const MainPage: React.FC = (): ReactElement => {
     asyncParseMd(treeState.targetTree.content).then(res => {
       setContentHtml(res);
     });
+
+    editSection.current?.focus();
   }, [treeState.targetTree])
 
   return (
@@ -53,6 +56,7 @@ const MainPage: React.FC = (): ReactElement => {
         </Grid.Column>
         <Grid.Column width={divided ? 10 : 16}>
           <Segment>
+            <div ref={editSection} tabIndex={-1}></div>
 
             {/* 작성 & 수정 */}
             <EditSection />
