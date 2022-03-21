@@ -33,6 +33,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
   }
 
   const [type, setType] = useState<number>(TreeType.FILE);
+  const [contentHtml, setContentHtml] = useState<string>('');
 
   const insertTree = async () => {
     const request: RequestCreateTree = {
@@ -64,9 +65,6 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         title: '',
         contentMd: '',
       });
-      // setTitle('');
-      // setContentMd('');
-      document.getElementById('fileViewContent')!.innerHTML = await parseMd(result.msObject.content);
     } else {
       alert(result.msContent);
     }
@@ -97,7 +95,6 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
             targetTree: result.msObject,
             actionType: ActionType.READ
           });
-          document.getElementById('fileViewContent')!.innerHTML = await parseMd(result.msObject.content);
         }
       } else {
         alert(result.msContent);
@@ -109,7 +106,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
   }
 
   const parseMdAndSetPreview = async (contentMd: string) => {
-    document.getElementById('preview')!.innerHTML = await parseMd(contentMd);
+    setContentHtml(await parseMd(contentMd));
   }
 
   const handleChangeFile = async (event: any) => {
@@ -131,9 +128,11 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
   }
 
   useEffect(() => {
-    // console.log('useEffect');
+    const asyncParseMd = async (data: string) => {
+      return await parseMd(data);
+    };
+
     if (treeState.actionType === ActionType.UPDATE) {
-      // console.log(ActionType.UPDATE);
       setInputs({
         ...inputs,
         title: treeState.targetTree.name,
@@ -141,8 +140,10 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         secret: treeState.targetTree.secret,
       });
       setType(treeState.targetTree.type);
+      asyncParseMd(treeState.targetTree.content).then(res => {
+        setContentHtml(res);
+      });
     } else {
-      // console.log(ActionType.CREATE);
       setInputs({
         ...inputs,
         title: '',
@@ -217,7 +218,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
             }}
           />
         }
-        <Container fluid id='preview'></Container>
+        <Container fluid dangerouslySetInnerHTML={{__html: contentHtml}}></Container>
         {treeState.actionType === ActionType.CREATE ? 
           <Button primary type='submit' onClick={(e) => {
             e.preventDefault();

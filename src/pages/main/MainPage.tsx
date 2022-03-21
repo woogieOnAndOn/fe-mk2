@@ -14,9 +14,22 @@ import PathSection from './component/PathSection';
 import EditSection from './component/EditSection';
 import { useContext } from 'react';
 
+import parseMd from '../../util/Parser.util';
+
 const MainPage: React.FC = (): ReactElement => {
   const { treeState, treeDispatch } = useContext(TreeContext);
   const [divided, setDivided] = useState<boolean>(true);
+  const [contentHtml, setContentHtml] = useState<string>('');
+
+  useEffect(() => {
+    const asyncParseMd = async (data: string) => {
+      return await parseMd(data);
+    };
+
+    asyncParseMd(treeState.targetTree.content).then(res => {
+      setContentHtml(res);
+    });
+  }, [treeState.targetTree])
 
   return (
     <Container fluid>
@@ -46,7 +59,7 @@ const MainPage: React.FC = (): ReactElement => {
 
             {/* 파일 조회 뷰 */}
             <div className='fileView' style={{display: treeState.actionType !== ActionType.READ ? 'none' : 'block'}}>
-              <div id='fileViewContent'></div>
+              <div dangerouslySetInnerHTML={{__html: contentHtml}}></div>
             </div>
           </Segment>
         </Grid.Column>

@@ -161,7 +161,6 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
       targetTree: data,
       actionType: ActionType.CREATE
     });
-    document.getElementById('preview')!.innerHTML = await parseMd('');
   }
 
   const showFile = async (data: Tree) => {
@@ -170,7 +169,6 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
       targetTree: data,
       actionType: ActionType.READ
     });
-    document.getElementById('fileViewContent')!.innerHTML = await parseMd(data.content);
   }
 
   const showEdit = async (data: Tree) => {
@@ -179,8 +177,6 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
       targetTree: data,
       actionType: ActionType.UPDATE
     });
-
-    document.getElementById('preview')!.innerHTML = await parseMd(data.content);
   }
 
   const showDelete = (data: Tree) => {
