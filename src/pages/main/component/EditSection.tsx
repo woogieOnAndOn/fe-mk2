@@ -105,10 +105,6 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
     }
   }
 
-  const parseMdAndSetPreview = async (contentMd: string) => {
-    setContentHtml(await parseMd(contentMd));
-  }
-
   const handleChangeFile = async (event: any) => {
     const formData = new FormData();
     const filesData = event.target.files;
@@ -124,7 +120,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
       ...inputs,
       contentMd: contentMd + htmlString
     });
-    parseMdAndSetPreview(contentMd + htmlString);
+    setContentHtml(await parseMd(contentMd + htmlString));
   }
 
   useEffect(() => {
@@ -151,9 +147,29 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         secret: 0,
       });
       setType(TreeType.FILE);
+      setContentHtml('');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [treeState.actionType, treeState.targetTree]);
+
+  useEffect(() => {
+    handleOnChange({ 
+      target: { name: 'contentMd', value: '' }
+    });
+    setContentHtml('');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [type]);
+
+  useEffect(() => {
+    const asyncParseMd = async (data: string) => {
+      return await parseMd(data);
+    };
+
+    asyncParseMd(contentMd).then(res => {
+      setContentHtml(res);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contentMd])
 
   return (
     <>
@@ -214,7 +230,6 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
             }}
             onChange={(e: any) => {
               handleOnChange(e);
-              parseMdAndSetPreview(e.target.value);
             }}
           />
         }
