@@ -11,3 +11,8 @@ export interface Message {
   msContent  : string;
   msObject  ?: any;
 }
+
+export enum ApiServiceName {
+  MK2,
+  MK4
+}
