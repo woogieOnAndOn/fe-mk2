@@ -1,0 +1,29 @@
+.inputText {
+  border: 0.5px solid gray;
+  border-radius: 3px;
+  padding: 6px;
+}
+
+.comicIdInput {
+  width: 70px;
+  margin-right: 10px;
+}
+
+.comicNameInput {
+  width: 300px;
+}
+
+.lastViewInput {
+  width: 50px;
+  text-align: center;
+  margin: 0px 10px;
+}
+
+.lastUpdateDateSection {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.lastUpdateDateEditSection {
+  display: inline-block;
+}
