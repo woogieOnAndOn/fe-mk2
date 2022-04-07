@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-vars */
 import './ComicPage.css';
 import React, { useState, useEffect, ReactElement, useRef, SyntheticEvent } from 'react';
-import { Icon, Button, Container, Checkbox, Form, Input, Radio, Select, TextArea, Grid, Image, Segment, Step, Card, Dropdown, DropdownItemProps, DropdownProps, List, ListItemProps } from 'semantic-ui-react'
+import { Icon, Button, Container, Checkbox, Form, Input, Radio, Select, TextArea, Grid, Image, Segment, Step, Card, Dropdown, DropdownItemProps, DropdownProps, List, ListItemProps, Label } from 'semantic-ui-react'
 import ComicService from '../../service/comic.service';
 import { Code, Comic } from '../../model/comic.model';
 import axios, { AxiosResponse } from 'axios'
@@ -192,27 +192,29 @@ const ComicPage: React.FC = (): ReactElement => {
       <Grid stackable columns={2}>
         <Grid.Column width={8}>
           <Segment>
-            {category && category.length > 0 &&
-              <Dropdown 
-                selection 
-                options={category} 
-                defaultValue={category[0].value}
-                onChange={handleOnclickCategory} 
-              />
-            }
+            <Form>
+              <Form.Group inline>
+              {category && category.length > 0 &&
+                <Dropdown 
+                  selection 
+                  options={category} 
+                  defaultValue={category[0].value}
+                  onChange={handleOnclickCategory} 
+                />
+              }
             
-            {baseUri.key && 
-              <div className={'refreshListSection'}>
-                <Button
+              {baseUri.key && 
+                <Form.Button
                   color='orange' 
                   size='small'
                   type='submit'
                   onClick={() => setRefreshComicList(!refreshComicList)}
                 >
                   리프레쉬
-                </Button>
-              </div>
-            }
+                </Form.Button>
+              }
+              </Form.Group>
+            </Form>
 
             <List divided relaxed>
               {baseUri.key &&
@@ -271,12 +273,12 @@ const ComicPage: React.FC = (): ReactElement => {
                       </div>
                     </List.Header>
                     <List.Description as='a'>
-                      <div id="comicDescriptionSection">
-                        <div className='lastUpdateDateSection'>
+                      <Form>
+                        <div id="lastUpdateDateSection">
                           {data.lastUpdateDate}
                         </div>
-                        <div className='lastUpdateDateEditSection'>
-                          <Button 
+                        <Form.Group inline>
+                          <Form.Button 
                             icon='minus square outline' 
                             size='mini'
                             color='red'
@@ -292,7 +294,7 @@ const ComicPage: React.FC = (): ReactElement => {
                               )
                             }}
                           />
-                          <input 
+                          <Form.Input 
                             id={String(data.comicId)}
                             type="text" 
                             className={'inputText lastViewInput'}
@@ -305,7 +307,7 @@ const ComicPage: React.FC = (): ReactElement => {
                               } 
                             }}
                           />
-                          <Button 
+                          <Form.Button 
                             icon='plus square outline' 
                             size='mini'
                             color='blue'
@@ -321,7 +323,7 @@ const ComicPage: React.FC = (): ReactElement => {
                               )
                             }}
                           />
-                          <Button
+                          <Form.Button
                             className='lastViewSubmitBtn'
                             color='green' 
                             size='mini'
@@ -329,9 +331,9 @@ const ComicPage: React.FC = (): ReactElement => {
                             onClick={() => lastViewSubmit(data.comicId)}
                           >
                             적용
-                          </Button>
-                        </div>
-                      </div>
+                          </Form.Button>
+                        </Form.Group>
+                      </Form>
                     </List.Description>
                   </List.Content>
                 </List.Item>

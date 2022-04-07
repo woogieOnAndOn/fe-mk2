@@ -1,39 +1,14 @@
-.inputText {
-  border: 0.5px solid gray;
-  border-radius: 3px;
-  padding: 6px;
-}
-
-.lastViewInput {
-  width: 50px;
-  text-align: center;
-  margin: 0px 10px;
-}
-
-.lastUpdateDateSection {
-  display: inline-block;
-  margin-right: 10px;
-}
-
-.lastUpdateDateEditSection {
-  display: inline-block;
-}
-
-.refreshListSection {
-  display: inline-block;
-  margin-left: 10px;
-}
-
 #comicNameSection {
-  border-radius: 3px;
-  padding: 5px 10px;
+  margin: 5px 0px;
 }
 
-#comicDescriptionSection {
-  padding: 5px 10px;
+#lastUpdateDateSection {
+  margin: 5px 0px;
 }
 
 .selectedComicName {
+  padding: 5px 10px;
   background-color: firebrick;
   color: white;
-}
+  border-radius: 3px;
+} 
