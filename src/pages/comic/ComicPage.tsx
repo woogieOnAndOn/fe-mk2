@@ -69,12 +69,16 @@ const ComicPage: React.FC = (): ReactElement => {
       if (res) {
         const codes: DropdownItemProps[] = [];
         for (let i = 0; i < res.length; i++) {
-          codes.push({
+          const dropDownContent = {
             key: res[i].codeId,
             value: res[i].codeName,
             text: res[i].codeId,
-            // onClick: () => handleOnclickCategory(res[i].codeId)
-          });
+          };
+          codes.push(dropDownContent);
+
+          if (i === 0) {
+            setBaseUri(dropDownContent);
+          }
         }
         setCategory(codes);
       }
@@ -188,7 +192,14 @@ const ComicPage: React.FC = (): ReactElement => {
       <Grid stackable columns={2}>
         <Grid.Column width={8}>
           <Segment>
-            <Dropdown clearable options={category} selection onChange={handleOnclickCategory} />
+            {category && category.length > 0 &&
+              <Dropdown 
+                selection 
+                options={category} 
+                defaultValue={category[0].value}
+                onChange={handleOnclickCategory} 
+              />
+            }
             
             {baseUri.key && 
               <div className={'refreshListSection'}>
