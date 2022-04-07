@@ -9,6 +9,7 @@ export interface Comic {
   lastViewEpisode: number;
   lastUpdateDate: string;
   categoryId: string;
+  selected?: boolean;
 }
 
 export interface ComicSearchCondition {

@@ -103,6 +103,17 @@ const ComicPage: React.FC = (): ReactElement => {
   }
 
   const handleOnclickList = async (selectedComicId: number) => {
+    // 클릭된 이름 색깔 변경을 위한 state 변경
+    const comics: Comic[] = [...comicList];
+    comics.forEach((data: Comic, index:number) => {
+      if (data.comicId === selectedComicId) {
+        data.selected = true;
+      } else {
+        data.selected = false;
+      }
+    });
+    setComicList(comics)
+
     const response: AxiosResponse =  await axios.get(`${baseUri.value}${selectedComicId}`);
     let html = response.data;
 
@@ -133,6 +144,7 @@ const ComicPage: React.FC = (): ReactElement => {
     }
 
     setListHtml(texts)
+
     editSection.current?.focus();
   }
 
@@ -234,9 +246,19 @@ const ComicPage: React.FC = (): ReactElement => {
               {comicList && comicList.map((data: Comic, index: number) => (
                 <List.Item key={index}>
                   <List.Content>
-                    <List.Header as='a' onClick={() => handleOnclickList(data.comicId)}>{data.comicName}</List.Header>
+                    <List.Header 
+                      as='a' 
+                      onClick={() => handleOnclickList(data.comicId)}
+                    >
+                      <div 
+                        id="comicNameSection"
+                        className={data.selected ? 'selectedComicName' : ''}
+                      >
+                        {data.comicName}
+                      </div>
+                    </List.Header>
                     <List.Description as='a'>
-                      <div style={{ marginTop: "10px" }}>
+                      <div id="comicDescriptionSection">
                         <div className='lastUpdateDateSection'>
                           {data.lastUpdateDate}
                         </div>

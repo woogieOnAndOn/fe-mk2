@@ -32,3 +32,17 @@
   display: inline-block;
   margin-left: 10px;
 }
+
+#comicNameSection {
+  border-radius: 3px;
+  padding: 5px 10px;
+}
+
+#comicDescriptionSection {
+  padding: 5px 10px;
+}
+
+.selectedComicName {
+  background-color: firebrick;
+  color: white;
+}
