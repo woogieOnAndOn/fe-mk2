@@ -27,3 +27,8 @@
 .lastUpdateDateEditSection {
   display: inline-block;
 }
+
+.refreshListSection {
+  display: inline-block;
+  margin-left: 10px;
+}

@@ -135,14 +135,21 @@ const ComicPage: React.FC = (): ReactElement => {
   }
 
   const lastViewSubmit = async (id: number) => {
-    const changedComics: Comic[] = [...comicList];
-    let updateComic: Comic | undefined = changedComics.find((data: Comic, index:number) => {return data.comicId === id});
-
-    if (updateComic) {
-      const response = await service.updateComic(updateComic);
-      if (!response) {
-        alert('실패')
+    try {
+      const changedComics: Comic[] = [...comicList];
+      let updateComic: Comic | undefined = changedComics.find((data: Comic, index:number) => {return data.comicId === id});
+  
+      if (updateComic) {
+        const response = await service.updateComic(updateComic);
+        if (!response) {
+          alert('실패')
+        } else {
+          setRefreshComicList(!refreshComicList);
+        }
       }
+    } catch(err) {
+      alert(err);
+      throw err;
     }
   }
 
@@ -168,6 +175,20 @@ const ComicPage: React.FC = (): ReactElement => {
         <Grid.Column width={8}>
           <Segment>
             <Dropdown clearable options={category} selection onChange={handleOnclickCategory} />
+            
+            {baseUri.key && 
+              <div className={'refreshListSection'}>
+                <Button
+                  className='refreshBtn'
+                  color='orange' 
+                  size='mini'
+                  type='submit'
+                  onClick={() => setRefreshComicList(!refreshComicList)}
+                >
+                  리프레쉬
+                </Button>
+              </div>
+            }
 
             <List divided relaxed>
               {baseUri.key &&
@@ -239,7 +260,7 @@ const ComicPage: React.FC = (): ReactElement => {
                             type="text" 
                             className={'inputText lastViewInput'}
                             maxLength={5}
-                            value={String(comicList.find((comic: Comic, index: number) => {return comic.comicId === data.comicId})!.lastViewEpisode)}
+                            value={String(comicList.find((comic: Comic, index: number) => { return comic.comicId === data.comicId })!.lastViewEpisode)}
                             onChange={(e) => changeHandler(data.comicId, data.comicName, e.target.value)}
                             onKeyPress= {(e: any) => {
                               if (e.key === 'Enter') {
