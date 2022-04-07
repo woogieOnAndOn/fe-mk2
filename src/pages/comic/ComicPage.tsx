@@ -18,6 +18,7 @@ const ComicPage: React.FC = (): ReactElement => {
   const [listHtml, setListHtml] = useState<string[]>([]);
   const [inputs, setInputs] = useState({ comicId: '', comicName: '', lastViewEpisode: '', lastUpdateDate: '', categoryId: '' });
   const { comicId, comicName, lastViewEpisode } = inputs;
+  const editSection = useRef<HTMLDivElement>(null);
   
   const handleOnChange = (e: any) => {
     const { name, value } = e.target;
@@ -132,6 +133,7 @@ const ComicPage: React.FC = (): ReactElement => {
     }
 
     setListHtml(texts)
+    editSection.current?.focus();
   }
 
   const lastViewSubmit = async (id: number) => {
@@ -304,6 +306,7 @@ const ComicPage: React.FC = (): ReactElement => {
         </Grid.Column>
         <Grid.Column width={8}>
           <Segment>
+            <div ref={editSection} tabIndex={-1}></div>
             <List divided relaxed>
               {listHtml && listHtml.map((data: string, index: number) => (
                 <List.Item key={index}>
