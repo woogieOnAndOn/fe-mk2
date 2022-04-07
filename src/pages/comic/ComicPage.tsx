@@ -202,17 +202,6 @@ const ComicPage: React.FC = (): ReactElement => {
                   onChange={handleOnclickCategory} 
                 />
               }
-            
-              {baseUri.key && 
-                <Form.Button
-                  color='orange' 
-                  size='small'
-                  type='submit'
-                  onClick={() => setRefreshComicList(!refreshComicList)}
-                >
-                  리프레쉬
-                </Form.Button>
-              }
               </Form.Group>
             </Form>
 
