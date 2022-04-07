@@ -204,9 +204,8 @@ const ComicPage: React.FC = (): ReactElement => {
             {baseUri.key && 
               <div className={'refreshListSection'}>
                 <Button
-                  className='refreshBtn'
                   color='orange' 
-                  size='mini'
+                  size='small'
                   type='submit'
                   onClick={() => setRefreshComicList(!refreshComicList)}
                 >
@@ -220,36 +219,39 @@ const ComicPage: React.FC = (): ReactElement => {
                 <List.Item>
                   <List.Content>
                     <List.Header as='a'>
-                      <input 
-                        name='comicId'
-                        type='text' 
-                        className={'inputText comicIdInput'}
-                        value={comicId}
-                        onChange={handleOnChange} 
-                      />
-                      <input 
-                        name='comicName'
-                        type='text' 
-                        className={'inputText comicNameInput'}
-                        value={comicName}
-                        onChange={handleOnChange} 
-                      />
-                      <input 
-                        name='lastViewEpisode'
-                        type='text' 
-                        className={'inputText lastViewInput'}
-                        value={lastViewEpisode}
-                        onChange={handleOnChange} 
-                      />
-                      <Button
-                        className='lastViewSubmitBtn'
-                        color='green' 
-                        size='mini'
-                        type='submit'
-                        onClick={addComit}
-                      >
-                        추가
-                      </Button>
+                      <Form>
+                        <Form.Group inline>
+                          <Form.Input 
+                            name='comicId'
+                            type='text' 
+                            width={3}
+                            value={comicId}
+                            onChange={handleOnChange} 
+                          />
+                          <Form.Input 
+                            name='comicName'
+                            type='text' 
+                            width={9}
+                            value={comicName}
+                            onChange={handleOnChange} 
+                          />
+                          <Form.Input 
+                            name='lastViewEpisode'
+                            type='text' 
+                            width={2}
+                            value={lastViewEpisode}
+                            onChange={handleOnChange} 
+                          />
+                          <Button
+                            color='green' 
+                            size='small'
+                            type='submit'
+                            onClick={addComit}
+                          >
+                            추가
+                          </Button>
+                        </Form.Group>
+                      </Form>
                     </List.Header>
                   </List.Content>
                 </List.Item>
