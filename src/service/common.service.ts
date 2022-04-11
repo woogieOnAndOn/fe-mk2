@@ -9,6 +9,7 @@ export default class CommonService {
     url: '',
     params: {},
     data: {},
+    withCredentials: true
   };
 
   public async callApi(service: ApiServiceName, method: Method, endPoint: string, params?: any, requestBody?: any): Promise<any> {
