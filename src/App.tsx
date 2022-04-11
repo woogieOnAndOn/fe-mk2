@@ -1,28 +1,27 @@
 /* eslint-disable no-unused-vars */
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
+import { TreeProvider } from './contexts/TreeContext';
 
-import { MainPage, KanbanPage, ComicPage } from './pages';
-import { TreeContext, TreeProvider } from './contexts/TreeContext';
-import { useContext } from 'react';
+import { MainPage, KanbanPage, ComicPage, AuthPage } from './pages';
 
 const App = () => {
-  const { treeState, treeDispatch } = useContext(TreeContext);
 
   return (
     <Router>
       <Switch>
-        <TreeContext.Provider value={{ treeState, treeDispatch }}>
-          <TreeProvider>
-            <Route path="/main" component={MainPage}></Route>
-          </TreeProvider>
-        </TreeContext.Provider>
+        <TreeProvider>
+          <Route path="/main" component={MainPage}></Route>
+        </TreeProvider>
       </Switch>
       <Switch>
         <Route path="/kanban" component={KanbanPage}></Route>
       </Switch>
       <Switch>
         <Route path="/comic" component={ComicPage}></Route>
+      </Switch>
+      <Switch>
+        <Route path="/auth" component={AuthPage}></Route>
       </Switch>
     </Router>
   );

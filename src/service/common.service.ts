@@ -23,13 +23,13 @@ export default class CommonService {
     let serviceUrl: string = '';
     switch (serviceName) {
       case ApiServiceName.MK2:
-        serviceUrl = String(process.env.REACT_APP_MK2_URL);
+        serviceUrl = String(process.env.REACT_APP_NODEJS_URL);
         break;
       case ApiServiceName.MK4:
-        serviceUrl = String(process.env.REACT_APP_MK4_URL);
+        serviceUrl = String(process.env.REACT_APP_DJANGO_URL);
         break;
       default:
-        serviceUrl = String(process.env.REACT_APP_MK2_URL);
+        serviceUrl = String(process.env.REACT_APP_NODEJS_URL);
         break;
     }
     return serviceUrl;
