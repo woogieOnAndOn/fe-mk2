@@ -6,22 +6,18 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import { 
   ComponentType, 
   IssueState, 
-  Issue,
-  RequestCreateIssue,
-  RequestUpdateIssueName,
-  RequestUpdateIssueUseTime,
-  RequestUpdateIssueState,
-  RequestDeleteIssue,
   ResponseRetrieveIssue,
+  RequestCreateIssue,
 } from '../../../model/issue.model'
 import KanbanService from '../../../service/kanban.service';
 import * as commonModel from '../../../model/common.model';
+import './MovableItem.css'
 
 interface ColumnProps {
   children?: ReactNode;
   labelColor: SemanticCOLORS;
   issueState: IssueState;
-  issues: Issue[];
+  issues: ResponseRetrieveIssue[];
   setIssues: Function;
   setReset: Function;
   showActionBtns: boolean
@@ -46,7 +42,7 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
 
   const [{canDrop, isOver}, drop] = useDrop(() => ({
     accept: ComponentType.ISSUE,
-    drop: async (item: Issue, monitor: DropTargetMonitor) => {
+    drop: async (item: ResponseRetrieveIssue, monitor: DropTargetMonitor) => {
       const updateResult: commonModel.Message = await kanbanService.updateState({
         issueId: item.issueId,
         issueState: issueState
@@ -84,7 +80,7 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
       setIssues(tmpIssues);
       setReset(true);
     },
-    canDrop: (item: Issue, monitor: DropTargetMonitor) => {
+    canDrop: (item: ResponseRetrieveIssue, monitor: DropTargetMonitor) => {
       let flag = false;
       switch (issueState) {
         case IssueState.WAIT:
@@ -117,13 +113,13 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
     const response: commonModel.Message = await kanbanService.insertIssue(request);
     if (response.msId) {
       const returnedObject = response.msObject;
-      const insertedIssue: Issue = {
+      const insertedIssue: ResponseRetrieveIssue = {
         issueId: returnedObject.id,
         issueName: returnedObject.issueName,
         issueState: IssueState.WAIT,
         useTime: 0.0,
       };
-      let tmpIssues: Issue[] = issues;
+      let tmpIssues: ResponseRetrieveIssue[] = issues;
       tmpIssues.push(insertedIssue);
       setIssueAndCheck('');
       setIssues(tmpIssues);

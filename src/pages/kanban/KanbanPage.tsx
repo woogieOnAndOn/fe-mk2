@@ -6,7 +6,7 @@ import { DndProvider, DropTargetMonitor, useDrag, useDrop } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { 
   IssueState, 
-  Issue,
+  ResponseRetrieveIssue,
 } from '../../model/issue.model'
 import KanbanService from '../../service/kanban.service';
 import * as commonModel from '../../model/common.model';
@@ -23,7 +23,7 @@ export interface ColumnProps {
 const KanbanPage = () => {
   const kanbanService = new KanbanService();
 
-  const [issues, setIssues] = useState<Issue[]>([]);
+  const [issues, setIssues] = useState<ResponseRetrieveIssue[]>([]);
   const [reset, setReset] = useState(false);
   const [showActionBtns, setShowActionBtns] = useState<boolean>(false);
 
@@ -64,6 +64,10 @@ const KanbanPage = () => {
                   data.issueState === IssueState.START && <MovableItem key={index} issues={issues} setIssues={setIssues} setReset={setReset} issue={data} showActionBtns={showActionBtns} />
                 ))}
               </AcceptableColumn>
+            </DndProvider>
+          </Grid.Row>
+          <Grid.Row>
+            <DndProvider backend={HTML5Backend}>
               <AcceptableColumn issueState={IssueState.COMPLETE} labelColor={'blue'} issues={issues} setIssues={setIssues} setReset={setReset} showActionBtns={showActionBtns} setShowActionBtns={setShowActionBtns} >
                 {issues.map((data, index) => (
                   data.issueState === IssueState.COMPLETE && <MovableItem key={index} issues={issues} setIssues={setIssues} setReset={setReset} issue={data} showActionBtns={showActionBtns} />
