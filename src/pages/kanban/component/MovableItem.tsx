@@ -217,16 +217,18 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
         <Card fluid>
           <Label color='teal' floating>{issueData.useTime}</Label>
           <Card.Content>
-            <pre>{issueData.issueName}</pre>
-            {issueData.issueChecks && issueData.issueChecks.length > 0 && issueData.issueChecks.map((check: ResponseRetrieveIssueCheck, index) => (
-              <div key={check.checkId}>
-                <input
-                  type='checkbox'
-                  checked={checkedIssueCheckIds.includes(check.checkId) ? true : false}
-                  onChange={(e: FormEvent<HTMLInputElement>)=> changeHandler(e.currentTarget.checked, check.checkId, issueData.issueId)}
-                />{check.checkName}
-              </div>
-            ))}
+            <div ref={drag}>
+              <pre>{issueData.issueName}</pre>
+              {issueData.issueChecks && issueData.issueChecks.length > 0 && issueData.issueChecks.map((check: ResponseRetrieveIssueCheck, index) => (
+                <div key={check.checkId}>
+                  <input
+                    type='checkbox'
+                    checked={checkedIssueCheckIds.includes(check.checkId) ? true : false}
+                    onChange={(e: FormEvent<HTMLInputElement>)=> changeHandler(e.currentTarget.checked, check.checkId, issueData.issueId)}
+                  />{check.checkName}
+                </div>
+              ))}
+            </div>
           </Card.Content>
         </Card>
         {showActionBtns && 
