@@ -35,7 +35,7 @@ const MainPage: React.FC = (): ReactElement => {
   }, [treeState.targetTree])
 
   return (
-    <Container fluid>
+    <Container fluid id="MainPage">
       <a className={'float expand'} onClick={() => {
         setDivided(divided => {return !divided});
       }}>
