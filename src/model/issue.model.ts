@@ -1,3 +1,5 @@
+import { ResponseRetrieveIssueCheck } from "./issueCheck.model";
+
 export interface Issue {
   issueId: number;
   issueName: string;
@@ -32,9 +34,10 @@ export interface RequestDeleteIssue {
 export interface ResponseRetrieveIssue {
   issueId: number;
   issueName: string;
-  issueState: string;
+  issueState: IssueState;
   useTime: number;
-  // creationDate: string; 
+  creationDate?: string; 
+  issueChecks?: ResponseRetrieveIssueCheck[];
 }
 
 export enum ComponentType {
