@@ -3,12 +3,7 @@ import React, { FC, ReactNode, useState, useEffect, ReactElement } from 'react';
 import { Icon, Button, Container, Checkbox, Form, Input, Radio, Select, TextArea, Grid, Image, Segment, Step, Card, Message, Label, SemanticCOLORS } from 'semantic-ui-react'
 import { DndProvider, DropTargetMonitor, useDrag, useDrop } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import { 
-  ComponentType, 
-  IssueState, 
-  ResponseRetrieveIssue,
-  RequestCreateIssue,
-} from '../../../model/issue.model'
+import * as Issue from '../../../model/issue.model'
 import KanbanService from '../../../service/kanban.service';
 import * as commonModel from '../../../model/common.model';
 import './MovableItem.css'
@@ -16,8 +11,8 @@ import './MovableItem.css'
 interface ColumnProps {
   children?: ReactNode;
   labelColor: SemanticCOLORS;
-  issueState: IssueState;
-  issues: ResponseRetrieveIssue[];
+  issueState: Issue.State;
+  issues: Issue.RetrieveRes[];
   setIssues: Function;
   setReset: Function;
   showActionBtns: boolean
@@ -41,8 +36,8 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
   const [issueAndCheck, setIssueAndCheck] = useState<string>('');
 
   const [{canDrop, isOver}, drop] = useDrop(() => ({
-    accept: ComponentType.ISSUE,
-    drop: async (item: ResponseRetrieveIssue, monitor: DropTargetMonitor) => {
+    accept: Issue.ComponentType.ISSUE,
+    drop: async (item: Issue.RetrieveRes, monitor: DropTargetMonitor) => {
       const updateResult: commonModel.Message = await kanbanService.updateState({
         issueId: item.issueId,
         issueState: issueState
@@ -54,15 +49,15 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
           msContent: '',
         };
         switch (issueState) {
-          case IssueState.WAIT:
-            if (item.issueState === IssueState.START) updateUseTimeResult = await kanbanService.updateUseTime({ issueId: item.issueId });
+          case Issue.State.WAIT:
+            if (item.issueState === Issue.State.START) updateUseTimeResult = await kanbanService.updateUseTime({ issueId: item.issueId });
             break;
-          case IssueState.START:
+          case Issue.State.START:
             break;
-          case IssueState.COMPLETE:
-            if (item.issueState === IssueState.START) updateUseTimeResult = await kanbanService.updateUseTime({ issueId: item.issueId });
+          case Issue.State.COMPLETE:
+            if (item.issueState === Issue.State.START) updateUseTimeResult = await kanbanService.updateUseTime({ issueId: item.issueId });
             break;
-          case IssueState.END:
+          case Issue.State.END:
             break;
           default: break;
         }
@@ -80,20 +75,20 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
       setIssues(tmpIssues);
       setReset(true);
     },
-    canDrop: (item: ResponseRetrieveIssue, monitor: DropTargetMonitor) => {
+    canDrop: (item: Issue.RetrieveRes, monitor: DropTargetMonitor) => {
       let flag = false;
       switch (issueState) {
-        case IssueState.WAIT:
-          flag = [IssueState.START].includes(item.issueState);
+        case Issue.State.WAIT:
+          flag = [Issue.State.START].includes(item.issueState);
           break;
-        case IssueState.START:
-          flag = [IssueState.WAIT, IssueState.COMPLETE].includes(item.issueState);
+        case Issue.State.START:
+          flag = [Issue.State.WAIT, Issue.State.COMPLETE].includes(item.issueState);
           break;
-        case IssueState.COMPLETE:
-          flag = [IssueState.START, IssueState.END].includes(item.issueState);
+        case Issue.State.COMPLETE:
+          flag = [Issue.State.START, Issue.State.END].includes(item.issueState);
           break;
-        case IssueState.END:
-          flag = [IssueState.COMPLETE].includes(item.issueState);
+        case Issue.State.END:
+          flag = [Issue.State.COMPLETE].includes(item.issueState);
           break;
         default:
           break;
@@ -107,19 +102,19 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
   }));
 
   const insertIssue = async () => {
-    const request: RequestCreateIssue = {
+    const request: Issue.CreateReq = {
       issueName: issueAndCheck,
     }
     const response: commonModel.Message = await kanbanService.insertIssue(request);
     if (response.msId) {
       const returnedObject = response.msObject;
-      const insertedIssue: ResponseRetrieveIssue = {
+      const insertedIssue: Issue.RetrieveRes = {
         issueId: returnedObject.id,
         issueName: returnedObject.issueName,
-        issueState: IssueState.WAIT,
+        issueState: Issue.State.WAIT,
         useTime: 0.0,
       };
-      let tmpIssues: ResponseRetrieveIssue[] = issues;
+      let tmpIssues: Issue.RetrieveRes[] = issues;
       tmpIssues.push(insertedIssue);
       setIssueAndCheck('');
       setIssues(tmpIssues);
@@ -128,7 +123,7 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
   };
 
   return (
-    <Grid.Column style={{marginTop: '15px', marginLeft: issueState === IssueState.WAIT && '20px', marginRight: issueState === IssueState.END && '20px'}}>
+    <Grid.Column style={{marginTop: '15px', marginLeft: issueState === Issue.State.WAIT && '20px', marginRight: issueState === Issue.State.END && '20px'}}>
       <Segment>
 
         {/* 컬럼 깃발 */}
@@ -137,7 +132,7 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
         </Label>
 
         {/* 추가 버튼 */}
-        {issueState === IssueState.WAIT &&
+        {issueState === Issue.State.WAIT &&
           <Button.Group basic size='mini' >
             <Button icon='plus square outline' onClick={() => setShowCreateForm(!showCreateForm)} />
           </Button.Group>
@@ -146,7 +141,7 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
         <div ref={drop} style={{ minHeight: '500px', marginTop: '10px' }}>
 
           {/* 텍스트 입력 창 */}
-          {showCreateForm && issueState === IssueState.WAIT &&
+          {showCreateForm && issueState === Issue.State.WAIT &&
             <Form style={{margin: '20px 0px'}}>
               <Form.Field 
                 control={TextArea} 

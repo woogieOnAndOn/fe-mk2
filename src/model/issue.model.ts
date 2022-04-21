@@ -3,38 +3,38 @@ import { ResponseRetrieveIssueCheck } from "./issueCheck.model";
 export interface Issue {
   issueId: number;
   issueName: string;
-  issueState: IssueState;
+  issueState: State;
   useTime: number;
   // creationDate: string;
 }
 
-export interface RequestCreateIssue {
+export interface CreateReq {
   issueName: string;
   // issueChecks: string[];
 }
 
-export interface RequestUpdateIssueName {
+export interface UpdateReq {
   issueId: number;
   issueName: string;
 }
 
-export interface RequestUpdateIssueUseTime {
+export interface UpdateUseTimeReq {
   issueId: number;
 }
 
-export interface RequestUpdateIssueState {
+export interface UpdateStateReq {
   issueId: number;
   issueState: string;
 }
 
-export interface RequestDeleteIssue {
+export interface DeleteReq {
   issueId: number;
 }
 
-export interface ResponseRetrieveIssue {
+export interface RetrieveRes {
   issueId: number;
   issueName: string;
-  issueState: IssueState;
+  issueState: State;
   useTime: number;
   creationDate?: string; 
   issueChecks?: ResponseRetrieveIssueCheck[];
@@ -45,7 +45,7 @@ export enum ComponentType {
   PHASE = 'phase',
 }
 
-export enum IssueState {
+export enum State {
   WAIT = 'wait',
   START = 'start',
   COMPLETE = 'complete',

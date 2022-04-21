@@ -2,21 +2,16 @@
 import React, { FC, FormEvent, ReactElement, useEffect, useState } from 'react';
 import { Icon, Button, Container, Checkbox, Form, Input, Radio, Select, TextArea, Grid, Image, Segment, Step, Card, Message, Label, SemanticCOLORS, Item } from 'semantic-ui-react'
 import { useDrag } from 'react-dnd'
-import { 
-  ComponentType, 
-  RequestDeleteIssue,
-  RequestUpdateIssueName,
-  ResponseRetrieveIssue,
-} from '../../../model/issue.model'
+import * as Issue from '../../../model/issue.model'
 import KanbanService from '../../../service/kanban.service';
 import * as commonModel from '../../../model/common.model';
 import { RequestCreateIssueCheck, RequestUpdateIssueCheckCompleteYn, RequestUpdateIssueCheckName, ResponseRetrieveIssueCheck, TmpCreateIssueCheck } from '../../../model/issueCheck.model';
 
 interface ItemProps {
-  issues: ResponseRetrieveIssue[];
+  issues: Issue.RetrieveRes[];
   setIssues: Function;
   setReset: Function;
-  issue: ResponseRetrieveIssue;
+  issue: Issue.RetrieveRes;
   showActionBtns: boolean;
 }
 
@@ -30,7 +25,7 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
   } = props;
   const kanbanService = new KanbanService();
   
-  const [issueData, setIssueData] = useState<ResponseRetrieveIssue>(issue);
+  const [issueData, setIssueData] = useState<Issue.RetrieveRes>(issue);
   const [editOrNot, setEditOrNot] = useState<boolean>(false);
   const [checkedIssueCheckIds, setCheckedIssueCheckIds] = useState<number[]>([]);
   const [newIssueChecks, setNewIssueChecks] = useState<TmpCreateIssueCheck[]>([]);
@@ -54,7 +49,7 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
   };
 
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: ComponentType.ISSUE,
+    type: Issue.ComponentType.ISSUE,
     item: { issueId: issueData.issueId, issueName: issueData.issueName, issueState: issueData.issueState, useTime: issueData.useTime },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
@@ -70,12 +65,12 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
   }
 
   const deleteIssue = async (issueId: number) => {
-    const request: RequestDeleteIssue = {
+    const request: Issue.DeleteReq = {
       issueId: issueId
     };
     const response: commonModel.Message = await kanbanService.deleteIssue(request);
     if (response.msId) {
-      let tmpIssues: ResponseRetrieveIssue[] = issues;
+      let tmpIssues: Issue.RetrieveRes[] = issues;
       const issueIds: number[] = tmpIssues.map((issue) => issue.issueId);
       tmpIssues.splice(issueIds.indexOf(issueId), 1);
       setIssues(tmpIssues);
@@ -127,7 +122,7 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
   };
 
   const handleOnclickEditSubmit = async () => {
-    const updateIssueRequest: RequestUpdateIssueName = {
+    const updateIssueRequest: Issue.UpdateReq = {
       issueId: issueData.issueId,
       issueName: issueData.issueName,
     };
