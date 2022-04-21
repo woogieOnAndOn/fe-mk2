@@ -1,7 +1,7 @@
 import * as Issue from '../model/issue.model';
 import CommonService from "./common.service";
 import { ApiServiceName } from '../model/common.model'
-import { RequestCreateIssueCheck, RequestUpdateIssueCheckCompleteYn, RequestUpdateIssueCheckName } from '../model/issueCheck.model';
+import * as IssueCheck from '../model/issueCheck.model';
 
 export default class KanbanService extends CommonService {
   async insertIssue<T>(request: Issue.CreateReq): Promise<T> {
@@ -34,17 +34,17 @@ export default class KanbanService extends CommonService {
     return response.status === 200 ? response.data : null;
   }
 
-  async updateIssueCheckCompleteYn<T>(request: RequestUpdateIssueCheckCompleteYn): Promise<T> {
+  async updateIssueCheckCompleteYn<T>(request: IssueCheck.UpdateCompleteYnReq): Promise<T> {
     const response = await this.callApi(ApiServiceName.MK2, 'PUT', `/issue/${request.issueId}/issueCheck/${request.checkId}/completeYn`, null, request);
     return response.status === 200 ? response.data : null;
   }
 
-  async insertIssueCheck<T>(request: RequestCreateIssueCheck): Promise<T> {
+  async insertIssueCheck<T>(request: IssueCheck.CreateReq): Promise<T> {
     const response = await this.callApi(ApiServiceName.MK2, 'POST', `/issue/${request.issueId}/issueCheck`, null, request);
     return response.status === 200 ? response.data : null;
   }
 
-  async updateIssueCheckName<T>(request: RequestUpdateIssueCheckName): Promise<T> {
+  async updateIssueCheckName<T>(request: IssueCheck.UpdateReq): Promise<T> {
     const response = await this.callApi(ApiServiceName.MK2, 'PUT', `/issue/${request.issueId}/issueCheck/${request.checkId}`, null, request);
     return response.status === 200 ? response.data : null;
   }

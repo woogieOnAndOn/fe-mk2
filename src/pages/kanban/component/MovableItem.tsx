@@ -5,7 +5,7 @@ import { useDrag } from 'react-dnd'
 import * as Issue from '../../../model/issue.model'
 import KanbanService from '../../../service/kanban.service';
 import * as commonModel from '../../../model/common.model';
-import { RequestCreateIssueCheck, RequestUpdateIssueCheckCompleteYn, RequestUpdateIssueCheckName, ResponseRetrieveIssueCheck, TmpCreateIssueCheck } from '../../../model/issueCheck.model';
+import * as IssueCheck from '../../../model/issueCheck.model';
 
 interface ItemProps {
   issues: Issue.RetrieveRes[];
@@ -28,8 +28,8 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
   const [issueData, setIssueData] = useState<Issue.RetrieveRes>(issue);
   const [editOrNot, setEditOrNot] = useState<boolean>(false);
   const [checkedIssueCheckIds, setCheckedIssueCheckIds] = useState<number[]>([]);
-  const [newIssueChecks, setNewIssueChecks] = useState<TmpCreateIssueCheck[]>([]);
-  const [deleteIssueChecks, setDeleteIssueChecks] = useState<ResponseRetrieveIssueCheck[]>([]);
+  const [newIssueChecks, setNewIssueChecks] = useState<IssueCheck.TmpCreateReq[]>([]);
+  const [deleteIssueChecks, setDeleteIssueChecks] = useState<IssueCheck.RetrieveRes[]>([]);
 
   const changeHandler = async (checked: boolean, checkId: number, issueId: number) => {
     if (checked) {
@@ -38,7 +38,7 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
       setCheckedIssueCheckIds(checkedIssueCheckIds.filter((el) => el !== checkId));
     }
 
-    const request: RequestUpdateIssueCheckCompleteYn = {
+    const request: IssueCheck.UpdateCompleteYnReq = {
       issueId: issueId,
       checkId: checkId,
     }
@@ -89,7 +89,7 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
   const handleOnchangeIssueCheckName = (e: any, checkId: number) => {
     const inputText: string = e.target.value;
     const issueChecks = [...issueData.issueChecks!];
-    issueChecks.forEach((check: ResponseRetrieveIssueCheck, index: number) => {
+    issueChecks.forEach((check: IssueCheck.RetrieveRes, index: number) => {
       if (check.checkId === checkId) {
         check.checkName = inputText;
       }
@@ -102,8 +102,8 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
 
   const handleOnchangenNewIssueCheckName = (e: any, checkId: number) => {
     const inputText: string = e.target.value;
-    const issueChecks: TmpCreateIssueCheck[] = [...newIssueChecks];
-    issueChecks.forEach((check: TmpCreateIssueCheck, index: number) => {
+    const issueChecks: IssueCheck.TmpCreateReq[] = [...newIssueChecks];
+    issueChecks.forEach((check: IssueCheck.TmpCreateReq, index: number) => {
       if (check.tmpCheckId === checkId) {
         check.checkName = inputText;
       }
@@ -112,7 +112,7 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
   }
   
   const handleOnclickAddChecks = () => {
-    const issueChecks: TmpCreateIssueCheck[] = [...newIssueChecks];
+    const issueChecks: IssueCheck.TmpCreateReq[] = [...newIssueChecks];
     const currentIssueChecksCount = issueData.issueChecks ? issueData.issueChecks.length : 0;
     issueChecks.push({
       tmpCheckId: currentIssueChecksCount + issueChecks.length + 1,
@@ -127,8 +127,8 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
       issueName: issueData.issueName,
     };
 
-    const editIssueCheckRequest: RequestUpdateIssueCheckName[] = [];
-    issueData.issueChecks && issueData.issueChecks.forEach(async (editCheck: ResponseRetrieveIssueCheck, index: number) => {
+    const editIssueCheckRequest: IssueCheck.UpdateReq[] = [];
+    issueData.issueChecks && issueData.issueChecks.forEach(async (editCheck: IssueCheck.RetrieveRes, index: number) => {
       editIssueCheckRequest.push({
         issueId: issueData.issueId,
         checkId: editCheck.checkId,
@@ -136,8 +136,8 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
       });
     });
 
-    const newIssueCheckRequest: RequestCreateIssueCheck[] = [];
-    newIssueChecks.forEach(async (newCheck: TmpCreateIssueCheck, index: number) => {
+    const newIssueCheckRequest: IssueCheck.CreateReq[] = [];
+    newIssueChecks.forEach(async (newCheck: IssueCheck.TmpCreateReq, index: number) => {
       newIssueCheckRequest.push({
         issueId: issueData.issueId,
         checkName: newCheck.checkName
@@ -156,7 +156,7 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
   useEffect(() => {
     if (issueData.issueChecks && issueData.issueChecks.length > 0) {
       const issueCheckIds: number[] = [];
-      issueData.issueChecks.forEach((check: ResponseRetrieveIssueCheck, index: number) => {
+      issueData.issueChecks.forEach((check: IssueCheck.RetrieveRes, index: number) => {
         if (check.completeYn === 'Y') {
           issueCheckIds.push(check.checkId);
         }
@@ -177,7 +177,7 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
             value={issueData.issueName}
             onChange={handleOnchangeIssueName} 
           />
-          {issueData.issueChecks && issueData.issueChecks.length > 0 && issueData.issueChecks.map((check: ResponseRetrieveIssueCheck, index) => (
+          {issueData.issueChecks && issueData.issueChecks.length > 0 && issueData.issueChecks.map((check: IssueCheck.RetrieveRes, index) => (
             <Form.Input
               key={'checkId-'+check.checkId}
               name={'issueCheckName-'+check.checkId}
@@ -186,7 +186,7 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
               onChange={(e) => handleOnchangeIssueCheckName(e, check.checkId)} 
             />
           ))}
-          {newIssueChecks && newIssueChecks.length > 0 && newIssueChecks.map((newCheck: TmpCreateIssueCheck, index: number) => (
+          {newIssueChecks && newIssueChecks.length > 0 && newIssueChecks.map((newCheck: IssueCheck.TmpCreateReq, index: number) => (
             <Form.Input
               key={'tmpCheckId-'+newCheck.tmpCheckId}
               name={'newIssueCheckName-'+newCheck.tmpCheckId}
@@ -216,7 +216,7 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
           <Card.Content>
             <div ref={drag}>
               <pre>{issueData.issueName}</pre>
-              {issueData.issueChecks && issueData.issueChecks.length > 0 && issueData.issueChecks.map((check: ResponseRetrieveIssueCheck, index) => (
+              {issueData.issueChecks && issueData.issueChecks.length > 0 && issueData.issueChecks.map((check: IssueCheck.RetrieveRes, index) => (
                 <div key={check.checkId}>
                   <input
                     type='checkbox'

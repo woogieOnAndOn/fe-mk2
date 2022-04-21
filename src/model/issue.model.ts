@@ -1,4 +1,4 @@
-import { ResponseRetrieveIssueCheck } from "./issueCheck.model";
+import * as IssueCheck from "./issueCheck.model";
 
 export interface Issue {
   issueId: number;
@@ -37,7 +37,7 @@ export interface RetrieveRes {
   issueState: State;
   useTime: number;
   creationDate?: string; 
-  issueChecks?: ResponseRetrieveIssueCheck[];
+  issueChecks?: IssueCheck.RetrieveRes[];
 }
 
 export enum ComponentType {

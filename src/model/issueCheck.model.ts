@@ -6,41 +6,41 @@ export interface IssueCheck {
   creationDate: string;
 }
 
-export interface TmpCreateIssueCheck {
+export interface TmpCreateReq {
   tmpCheckId: number;
   checkName: string;
 }
 
-export interface RequestCreateIssueCheck {
+export interface CreateReq {
   issueId: number;
   checkName: string;
 }
 
-export interface RequestUpdateIssueCheckName {
+export interface UpdateReq {
   issueId: number;
   checkId: number;
   checkName: string;
 }
 
-export interface RequestUpdateIssueCheckCompleteYn {
+export interface UpdateCompleteYnReq {
   issueId: number;
   checkId: number;
 }
 
-export interface RequestDeleteIssueCheck {
+export interface DeleteReq {
   issueId: number;
   checkId: number; 
 }
 
-export interface RequestRetrieveIssueCheck {
+export interface RetrieveReq {
   issueId: number;
 }
 
-export interface RequestRetrieveAllIssueCheck {
+export interface RetrieveAllReq {
   user: string;
 }
 
-export interface ResponseRetrieveIssueCheck {
+export interface RetrieveRes {
   issueId: number;
   checkId: number;
   checkName: string;
