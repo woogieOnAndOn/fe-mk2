@@ -50,8 +50,15 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: Issue.ComponentType.ISSUE,
-    item: { issueId: issueData.issueId, issueName: issueData.issueName, issueState: issueData.issueState, useTime: issueData.useTime },
-    collect: (monitor) => ({
+    item: { 
+      issueId: issueData.issueId, 
+      issueName: issueData.issueName, 
+      issueState: issueData.issueState, 
+      useTime: issueData.useTime, 
+      creationDate: issueData.creationDate, 
+      issueChecks: issueData.issueChecks 
+    },
+      collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
   }));
@@ -113,19 +120,50 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
   
   const handleOnclickAddChecks = () => {
     const issueChecks: IssueCheck.TmpCreateReq[] = [...newIssueChecks];
-    const currentIssueChecksCount = issueData.issueChecks ? issueData.issueChecks.length : 0;
+    let maxIssueCheckId = 0;
+    issueData.issueChecks.forEach((data: IssueCheck.RetrieveRes, index: number) => {
+      maxIssueCheckId = data.checkId > maxIssueCheckId ? data.checkId : maxIssueCheckId;
+    })
+
     issueChecks.push({
-      tmpCheckId: currentIssueChecksCount + issueChecks.length + 1,
+      tmpCheckId: maxIssueCheckId + issueChecks.length + 1,
       checkName: ''
     });
     setNewIssueChecks(issueChecks);
   };
 
+  const handleOnclickDeleteChecks = (newCheck: boolean, checkId: number) => {
+    if (newCheck) {
+      let checks: IssueCheck.TmpCreateReq[] = [...newIssueChecks];
+      checks = checks.filter((data: IssueCheck.TmpCreateReq, index: number) => {
+        return data.tmpCheckId !== checkId; 
+      });
+      setNewIssueChecks(checks);
+    } else {
+      const issue = {...issueData};
+      let checks: IssueCheck.RetrieveRes[] = [...issueData.issueChecks];
+      const deleteChecks: IssueCheck.RetrieveRes[] = [...deleteIssueChecks];
+
+      checks = checks.filter((data: IssueCheck.RetrieveRes, index: number) => {
+        if (data.checkId === checkId) {
+          deleteChecks.push(data);
+        }
+        return data.checkId !== checkId; 
+      });
+      issue.issueChecks = checks;
+      setIssueData(issue);
+      setDeleteIssueChecks(deleteChecks);
+    }
+  }
+
   const handleOnclickEditSubmit = async () => {
-    const updateIssueRequest: Issue.UpdateReq = {
-      issueId: issueData.issueId,
-      issueName: issueData.issueName,
-    };
+    const newIssueCheckRequest: IssueCheck.CreateReq[] = [];
+    newIssueChecks.forEach(async (newCheck: IssueCheck.TmpCreateReq, index: number) => {
+      newIssueCheckRequest.push({
+        issueId: issueData.issueId,
+        checkName: newCheck.checkName
+      });
+    });
 
     const editIssueCheckRequest: IssueCheck.UpdateReq[] = [];
     issueData.issueChecks && issueData.issueChecks.forEach(async (editCheck: IssueCheck.RetrieveRes, index: number) => {
@@ -136,13 +174,22 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
       });
     });
 
-    const newIssueCheckRequest: IssueCheck.CreateReq[] = [];
-    newIssueChecks.forEach(async (newCheck: IssueCheck.TmpCreateReq, index: number) => {
-      newIssueCheckRequest.push({
+    const deleteIssueCheckRequest: IssueCheck.DeleteReq[] = [];
+    deleteIssueChecks.forEach(async (deleteCheck: IssueCheck.RetrieveRes, index: number) => {
+      deleteIssueCheckRequest.push({
         issueId: issueData.issueId,
-        checkName: newCheck.checkName
+        checkId: deleteCheck.checkId
       });
     });
+
+    const updateIssueRequest: Issue.UpdateReq = {
+      issueId: issueData.issueId,
+      issueName: issueData.issueName,
+      useTime: issueData.useTime,
+      newIssueChecks: newIssueCheckRequest,
+      editIssueChecks: editIssueCheckRequest,
+      deleteIssueChecks: deleteIssueCheckRequest,
+    };
 
     const updateIssueResponse: commonModel.Message = await kanbanService.updateIssueName(updateIssueRequest);
     if (!updateIssueResponse || (updateIssueResponse && !updateIssueResponse.msId)) {
@@ -169,45 +216,74 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
     <div id="MovableItem">
       {editOrNot ? 
         <Form className='editForm'>
-          <Form.Field 
-            name='issueName'
-            control={TextArea}
-            style={{ minHeight: 50 }}
-            placeholder='내용을 입력해 주세요'
-            value={issueData.issueName}
-            onChange={handleOnchangeIssueName} 
-          />
-          {issueData.issueChecks && issueData.issueChecks.length > 0 && issueData.issueChecks.map((check: IssueCheck.RetrieveRes, index) => (
-            <Form.Input
-              key={'checkId-'+check.checkId}
-              name={'issueCheckName-'+check.checkId}
-              placeholder='내용' 
-              value={check.checkName} 
-              onChange={(e) => handleOnchangeIssueCheckName(e, check.checkId)} 
-            />
-          ))}
-          {newIssueChecks && newIssueChecks.length > 0 && newIssueChecks.map((newCheck: IssueCheck.TmpCreateReq, index: number) => (
-            <Form.Input
-              key={'tmpCheckId-'+newCheck.tmpCheckId}
-              name={'newIssueCheckName-'+newCheck.tmpCheckId}
-              placeholder='내용' 
-              value={newCheck.checkName} 
-              onChange={(e) => handleOnchangenNewIssueCheckName(e, newCheck.tmpCheckId)} 
-            />
-          ))}
-          <Button
-            color='orange'
-            onClick={handleOnclickAddChecks}
-          >
-            추가
-          </Button>
-          <Button
-            color='green'
-            type='submit'
-            onClick={handleOnclickEditSubmit}
-          >
-            수정
-          </Button>
+          <Grid columns={2}>
+            <Grid.Column width={16}>
+              <Form.Field 
+                name='issueName'
+                control={TextArea}
+                style={{ minHeight: 50 }}
+                placeholder='내용을 입력해 주세요'
+                value={issueData.issueName}
+                onChange={handleOnchangeIssueName} 
+              />
+            </Grid.Column>
+
+            {issueData.issueChecks && issueData.issueChecks.length > 0 && issueData.issueChecks.map((check: IssueCheck.RetrieveRes, index) => (
+              <>
+                <Grid.Column width={14}>
+                  <Form.Input
+                    key={'checkId-'+check.checkId}
+                    name={'issueCheckName-'+check.checkId}
+                    placeholder='내용' 
+                    value={check.checkName} 
+                    onChange={(e) => handleOnchangeIssueCheckName(e, check.checkId)} 
+                  />
+                </Grid.Column>
+                <Grid.Column width={2}>
+                  <Button.Group basic size='mini'>
+                    <Button icon='trash alternate outline' onClick={() => handleOnclickDeleteChecks(false, check.checkId)} />
+                  </Button.Group>
+                </Grid.Column>
+              </>
+            ))}
+
+            {newIssueChecks && newIssueChecks.length > 0 && newIssueChecks.map((newCheck: IssueCheck.TmpCreateReq, index: number) => (
+              <>
+                <Grid.Column width={14}>
+                  <Form.Input
+                    key={'tmpCheckId-'+newCheck.tmpCheckId}
+                    name={'newIssueCheckName-'+newCheck.tmpCheckId}
+                    placeholder='내용' 
+                    value={newCheck.checkName} 
+                    onChange={(e) => handleOnchangenNewIssueCheckName(e, newCheck.tmpCheckId)} 
+                  />
+                </Grid.Column>
+                <Grid.Column width={2}>
+                  <Button.Group basic size='mini'>
+                    <Button icon='trash alternate outline' onClick={() => handleOnclickDeleteChecks(true, newCheck.tmpCheckId)} />
+                  </Button.Group>
+                </Grid.Column>
+              </>
+            ))}
+
+            <Grid.Column width={16}>
+              <Button
+                color='orange'
+                floated='left'
+                onClick={handleOnclickAddChecks}
+              >
+                추가
+              </Button>
+              <Button
+                color='green'
+                floated='right'
+                type='submit'
+                onClick={handleOnclickEditSubmit}
+              >
+                수정
+              </Button>
+            </Grid.Column>
+          </Grid>
         </Form>
           :
         <>

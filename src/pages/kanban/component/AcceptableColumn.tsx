@@ -113,6 +113,8 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
         issueName: returnedObject.issueName,
         issueState: Issue.State.WAIT,
         useTime: 0.0,
+        creationDate: '',
+        issueChecks: []
       };
       let tmpIssues: Issue.RetrieveRes[] = issues;
       tmpIssues.push(insertedIssue);

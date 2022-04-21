@@ -11,12 +11,6 @@ import * as commonModel from '../../model/common.model';
 import AcceptableColumn from './component/AcceptableColumn';
 import MovableItem from './component/MovableItem';
 
-export interface ColumnProps {
-  children?: ReactNode;
-  labelColor: SemanticCOLORS;
-  issueState: Issue.State;
-}
-
 const KanbanPage = () => {
   const kanbanService = new KanbanService();
 

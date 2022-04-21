@@ -5,7 +5,7 @@ export interface Issue {
   issueName: string;
   issueState: State;
   useTime: number;
-  // creationDate: string;
+  creationDate: string;
 }
 
 export interface CreateReq {
@@ -16,6 +16,10 @@ export interface CreateReq {
 export interface UpdateReq {
   issueId: number;
   issueName: string;
+  useTime: number;
+  newIssueChecks: IssueCheck.CreateReq[]
+  editIssueChecks: IssueCheck.UpdateReq[]
+  deleteIssueChecks: IssueCheck.DeleteReq[]
 }
 
 export interface UpdateUseTimeReq {
@@ -36,8 +40,8 @@ export interface RetrieveRes {
   issueName: string;
   issueState: State;
   useTime: number;
-  creationDate?: string; 
-  issueChecks?: IssueCheck.RetrieveRes[];
+  creationDate: string; 
+  issueChecks: IssueCheck.RetrieveRes[];
 }
 
 export enum ComponentType {
