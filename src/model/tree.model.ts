@@ -1,6 +1,6 @@
 export interface Tree {
   id          :number;
-  type        :TreeType;
+  type        :Type;
   name        :string;
   content     :string;
   depth       :number;
@@ -9,13 +9,13 @@ export interface Tree {
   children    :Tree[];
 }
 
-export interface TreeSearchCondition {
+export interface RetrieveReq {
   depth : number;
   parent: number;
   secret: number;
 }
 
-export interface RequestCreateTree {
+export interface CreateReq {
   type     :number;
   name     :string;
   content  :string;
@@ -24,19 +24,19 @@ export interface RequestCreateTree {
   secret   :number;          // 0: piblic, 1: private
 }
 
-export interface RequestUpdateTree {
+export interface UpdateReq {
   id       :number;
   name     :string;
   content  :string;
   secret   :number;          // 0: piblic, 1: private
 }
 
-export interface RequestDeleteTree {
+export interface DeleteReq {
   id       :number;
   type     :number;
 }
 
-export interface ResponseGetTree {
+export interface RetrieveRes {
   id       :number;
   type     :number;
   name     :string;
@@ -44,9 +44,10 @@ export interface ResponseGetTree {
   depth    :number;
   parent   :number;
   secret   :number;          // 0: piblic, 1: private
+  children    :Tree[];
 }
 
-export interface RequestUpdateSeqTree {
+export interface UpdateSeqReq {
   id       ?:number;
   type     ?:number;            // 10: folder, 20: file
   depth    ?:number;
@@ -65,7 +66,7 @@ export enum ActionType {
   UPDATE = 'UPDATE',
 }
 
-export enum TreeType {
+export enum Type {
   FORDER = 10,
   FILE = 20,
 }

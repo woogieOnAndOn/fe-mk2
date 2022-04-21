@@ -6,7 +6,7 @@ import { TreeActionType } from '../../../reducer/tree/actions';
 import TreeService from '../../../service/tree.service';
 
 import { Message } from '../../../model/common.model';
-import { Tree, ActionType, TreeType, RequestUpdateSeqTree, UpDown, TreeSearchCondition } from '../../../model/tree.model';
+import * as Tree from '../../../model/tree.model';
 import parseMd from '../../../util/Parser.util';
 import { findAndUpdateTree, findTreeById } from '../../../util/Tree.util';
 
@@ -18,7 +18,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
 
   const initialTree = {
     id: 0,
-    type: TreeType.FORDER,
+    type: Tree.Type.FORDER,
     name: '',
     content: '',
     depth: 0,
@@ -27,20 +27,20 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     children: [],
   };
 
-  const showDirectories = (async (data: Tree) => {
-    const newSearchCondition: TreeSearchCondition = {
+  const showDirectories = (async (data: Tree.RetrieveRes) => {
+    const newSearchCondition: Tree.RetrieveReq = {
       depth: data.depth + 1,
       parent: data.id,
       secret: 0,
     };
     retrieveTree(newSearchCondition)
       .then(response => {
-        let updatedTrees: Tree[] = [];
+        let updatedTrees: Tree.RetrieveRes[] = [];
         if (newSearchCondition.depth === 1) {
           updatedTrees = response;
         } else {
           data.children = response;
-          let tmpState: Tree[] = treeState.datas;
+          let tmpState: Tree.RetrieveRes[] = treeState.datas;
           updatedTrees = findAndUpdateTree(tmpState, data);
         }
         
@@ -70,7 +70,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
 
     const result: Message = await treeService.deleteTree(request);
     if (result && result.msId) {
-      const parentTree: Tree | null = findTreeById(treeState.datas, data.parent);
+      const parentTree: Tree.RetrieveRes | null = findTreeById(treeState.datas, data.parent);
 
       if (parentTree) {
         showDirectories(parentTree);
@@ -88,18 +88,18 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     }
   }
 
-  const upTree = async (data: Tree) => {
-    const request: RequestUpdateSeqTree = {
+  const upTree = async (data: Tree.RetrieveRes) => {
+    const request: Tree.UpdateSeqReq = {
       id: data.id,
       type: data.type,
       depth: data.depth,
       parent: data.parent,
-      upDown: UpDown.UP,
+      upDown: Tree.UpDown.UP,
     }
 
     const result: Message = await treeService.updateSeqTree(request);
     if (result && result.msId) {
-      const parentTree: Tree | null = findTreeById(treeState.datas, data.parent);
+      const parentTree: Tree.RetrieveRes | null = findTreeById(treeState.datas, data.parent);
 
       if (parentTree) {
         showDirectories(parentTree);
@@ -117,18 +117,18 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     }
   };
 
-  const downTree = async (data: Tree) => {
-    const request: RequestUpdateSeqTree = {
+  const downTree = async (data: Tree.RetrieveRes) => {
+    const request: Tree.UpdateSeqReq = {
       id: data.id,
       type: data.type,
       depth: data.depth,
       parent: data.parent,
-      upDown: UpDown.DOWN,
+      upDown: Tree.UpDown.DOWN,
     }
 
     const result: Message = await treeService.updateSeqTree(request);
     if (result && result.msId) {
-      const parentTree: Tree | null = findTreeById(treeState.datas, data.parent);
+      const parentTree: Tree.RetrieveRes | null = findTreeById(treeState.datas, data.parent);
 
       if (parentTree) {
         showDirectories(parentTree);
@@ -155,34 +155,34 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
   };
 
   // 창 띄우기 
-  const showCreate = async (data: Tree) => {
+  const showCreate = async (data: Tree.RetrieveRes) => {
     treeDispatch({
       type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
       targetTree: data,
-      actionType: ActionType.CREATE
+      actionType: Tree.ActionType.CREATE
     });
   }
 
-  const showFile = async (data: Tree) => {
+  const showFile = async (data: Tree.RetrieveRes) => {
     treeDispatch({
       type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
       targetTree: data,
-      actionType: ActionType.READ
+      actionType: Tree.ActionType.READ
     });
   }
 
-  const showEdit = async (data: Tree) => {
+  const showEdit = async (data: Tree.RetrieveRes) => {
     treeDispatch({
       type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
       targetTree: data,
-      actionType: ActionType.UPDATE
+      actionType: Tree.ActionType.UPDATE
     });
   }
 
-  const showDelete = (data: Tree) => {
+  const showDelete = (data: Tree.RetrieveRes) => {
     let result;
-    if (data.type === TreeType.FORDER)      result = window.confirm('선택 폴더를 삭제하시겠습니까?\n해당 폴더의 하위 파일들이 모두 삭제됩니다.');
-    else if (data.type === TreeType.FILE) result = window.confirm('선택 파일을 삭제하시겠습니까?');
+    if (data.type === Tree.Type.FORDER)      result = window.confirm('선택 폴더를 삭제하시겠습니까?\n해당 폴더의 하위 파일들이 모두 삭제됩니다.');
+    else if (data.type === Tree.Type.FILE) result = window.confirm('선택 파일을 삭제하시겠습니까?');
 
     if (result) {
       deleteTree(data);
@@ -196,21 +196,21 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [treeState.upsertTree]);
 
-  type myType = { data: Tree, index: number, folderTotalCount: number, fileTotalCount: number};
+  type myType = { data: Tree.RetrieveRes, index: number, folderTotalCount: number, fileTotalCount: number};
   const RecursiveComponent = ({data, index, folderTotalCount, fileTotalCount}: myType) => {
     const hasChildren = data.children ? true : false;
     let childFolderTotalCount = 0;
     let childFileTotalCount = 0;
     if (hasChildren) {
-      childFolderTotalCount = data.children.filter(data => data.type === TreeType.FORDER).length;
-      childFileTotalCount = data.children.filter(data => data.type === TreeType.FILE).length;
+      childFolderTotalCount = data.children.filter(data => data.type === Tree.Type.FORDER).length;
+      childFileTotalCount = data.children.filter(data => data.type === Tree.Type.FILE).length;
     }
 
     return (
       <div key={data.id} style={{ margin: "5px 0px 5px 5px"}}>
         {
           {
-            [TreeType.FORDER]:
+            [Tree.Type.FORDER]:
               <div> 
                 <Button color='orange' onClick={() => showDirectories(data)}>
                   <Icon name='folder open outline' />
@@ -225,7 +225,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
                 </Button.Group>
               </div>
             ,
-            [TreeType.FILE]:
+            [Tree.Type.FILE]:
               <div>
                 <Button color='blue' onClick={() => showFile(data)} >
                   <Icon name='file alternate outline' />
@@ -249,8 +249,8 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     )
   }
 
-  const folderTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === TreeType.FORDER).length;
-  const fileTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === TreeType.FILE).length;
+  const folderTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === Tree.Type.FORDER).length;
+  const fileTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === Tree.Type.FILE).length;
 
   return (
     <>

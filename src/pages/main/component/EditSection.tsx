@@ -5,7 +5,7 @@ import { TreeContext } from '../../../contexts/TreeContext';
 import { TreeActionType } from '../../../reducer/tree/actions';
 
 import TreeService from '../../../service/tree.service';
-import { RequestCreateTree, RequestUpdateTree, ActionType, TreeType, Tree } from '../../../model/tree.model';
+import * as Tree from '../../../model/tree.model';
 import { Message } from '../../../model/common.model';
 import parseMd from '../../../util/Parser.util';
 import { findAndUpdateTree } from '../../../util/Tree.util';
@@ -32,11 +32,11 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
     });
   }
 
-  const [type, setType] = useState<number>(TreeType.FILE);
+  const [type, setType] = useState<number>(Tree.Type.FILE);
   const [contentHtml, setContentHtml] = useState<string>('');
 
   const insertTree = async () => {
-    const request: RequestCreateTree = {
+    const request: Tree.CreateReq = {
       type: type,
       name: title,
       content: contentMd,
@@ -47,7 +47,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
 
     const result: Message = await treeService.insertTree(request);
     if (result && result.msId) {
-      const insertedTree: Tree = result.msObject;
+      const insertedTree: Tree.RetrieveRes = result.msObject;
       treeDispatch({
         type: TreeActionType.SET_UPSERT_TREE,
         searchCondition: treeState.targetTree,
@@ -57,7 +57,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
       treeDispatch({
         type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
         targetTree: insertedTree,
-        actionType: ActionType.READ
+        actionType: Tree.ActionType.READ
       });
       
       setInputs({
@@ -72,7 +72,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
 
   const updateTree = async (afterType= 'continue') => {
     try {
-      const request: RequestUpdateTree = {
+      const request: Tree.UpdateReq = {
         id: treeState.targetTree.id,
         name: title,
         content: contentMd,
@@ -82,8 +82,8 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
       const result: Message = await treeService.updateTree(request);
       if (result && result.msId) {
         alert(result.msContent);
-        let tmpState: Tree[] = treeState.datas;
-        const updatedTrees: Tree[] = findAndUpdateTree(tmpState, result.msObject);
+        let tmpState: Tree.RetrieveRes[] = treeState.datas;
+        const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(tmpState, result.msObject);
         
         treeDispatch({
           type: TreeActionType.SET_SEARCH_RESULT,
@@ -93,7 +93,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
           treeDispatch({
             type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
             targetTree: result.msObject,
-            actionType: ActionType.READ
+            actionType: Tree.ActionType.READ
           });
         }
       } else {
@@ -128,7 +128,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
       return await parseMd(data);
     };
 
-    if (treeState.actionType === ActionType.UPDATE) {
+    if (treeState.actionType === Tree.ActionType.UPDATE) {
       setInputs({
         ...inputs,
         title: treeState.targetTree.name,
@@ -146,7 +146,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         contentMd: '',
         secret: 0,
       });
-      setType(TreeType.FILE);
+      setType(Tree.Type.FILE);
       setContentHtml('');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -173,25 +173,25 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
 
   return (
     <>
-      <Form style={{display: treeState.actionType !== ActionType.CREATE && treeState.actionType !== ActionType.UPDATE && 'none'}}>
+      <Form style={{display: treeState.actionType !== Tree.ActionType.CREATE && treeState.actionType !== Tree.ActionType.UPDATE && 'none'}}>
         {/* 타입 */}
         <Form.Group inline>
           <label>타입</label>
           <Form.Field
             control={Radio}
             label='폴더'
-            value={TreeType.FORDER}
-            disabled={treeState.actionType === ActionType.UPDATE && true}
-            checked={type === TreeType.FORDER}
-            onChange={() => setType(TreeType.FORDER)}
+            value={Tree.Type.FORDER}
+            disabled={treeState.actionType === Tree.ActionType.UPDATE && true}
+            checked={type === Tree.Type.FORDER}
+            onChange={() => setType(Tree.Type.FORDER)}
           />
           <Form.Field
             control={Radio}
             label='파일'
-            value={TreeType.FILE}
-            disabled={treeState.actionType === ActionType.UPDATE && true}
-            checked={type === TreeType.FILE}
-            onChange={() => setType(TreeType.FILE)}
+            value={Tree.Type.FILE}
+            disabled={treeState.actionType === Tree.ActionType.UPDATE && true}
+            checked={type === Tree.Type.FILE}
+            onChange={() => setType(Tree.Type.FILE)}
           />
         </Form.Group>
 
@@ -207,12 +207,12 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         </Form.Field>
 
         {/* 이미지 첨부 */}
-        {type === TreeType.FILE &&
+        {type === Tree.Type.FILE &&
           <Form.Input type='file' multiple="multiple" onChange={handleChangeFile} accept='image/*' />
         }
 
         {/* 내용 */}
-        {type === TreeType.FILE &&
+        {type === Tree.Type.FILE &&
           <Form.Field
             name='contentMd'
             control={TextArea}
@@ -222,10 +222,10 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
             value={contentMd}
             onKeyPress= {(e: any) => {
               if (e.key === 'Enter' && e.ctrlKey && !e.shiftKey) {
-                if (treeState.actionType === ActionType.UPDATE) updateTree();
-                else if (treeState.actionType === ActionType.CREATE) insertTree();
+                if (treeState.actionType === Tree.ActionType.UPDATE) updateTree();
+                else if (treeState.actionType === Tree.ActionType.CREATE) insertTree();
               } else if (e.key === 'Enter' && e.ctrlKey && e.shiftKey) {
-                if (treeState.actionType === ActionType.UPDATE) updateTree('finish');
+                if (treeState.actionType === Tree.ActionType.UPDATE) updateTree('finish');
               }
             }}
             onChange={(e: any) => {
@@ -234,7 +234,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
           />
         }
         <Container fluid dangerouslySetInnerHTML={{__html: contentHtml}}></Container>
-        {treeState.actionType === ActionType.CREATE ? 
+        {treeState.actionType === Tree.ActionType.CREATE ? 
           <Button primary type='submit' onClick={(e) => {
             e.preventDefault();
             insertTree();

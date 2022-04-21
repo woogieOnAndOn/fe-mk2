@@ -1,6 +1,6 @@
 import { TreeState } from './states';
 import { TreeAction, TreeActionType } from './actions';
-import { ActionType } from '../../model/tree.model';
+import * as Tree from '../../model/tree.model';
 
 export const initialState: TreeState = {
   searchCondition: {
@@ -16,7 +16,7 @@ export const initialState: TreeState = {
   searchIndex: 0,
   datas: [],
   showActionBtns: false,
-  actionType: ActionType.CREATE,
+  actionType: Tree.ActionType.CREATE,
   targetTree: {
     id: 0,
     type: 20,

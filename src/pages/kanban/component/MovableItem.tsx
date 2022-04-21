@@ -34,6 +34,7 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
   const [editOrNot, setEditOrNot] = useState<boolean>(false);
   const [checkedIssueCheckIds, setCheckedIssueCheckIds] = useState<number[]>([]);
   const [newIssueChecks, setNewIssueChecks] = useState<TmpCreateIssueCheck[]>([]);
+  const [deleteIssueChecks, setDeleteIssueChecks] = useState<ResponseRetrieveIssueCheck[]>([]);
 
   const changeHandler = async (checked: boolean, checkId: number, issueId: number) => {
     if (checked) {
@@ -130,6 +131,24 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
       issueId: issueData.issueId,
       issueName: issueData.issueName,
     };
+
+    const editIssueCheckRequest: RequestUpdateIssueCheckName[] = [];
+    issueData.issueChecks && issueData.issueChecks.forEach(async (editCheck: ResponseRetrieveIssueCheck, index: number) => {
+      editIssueCheckRequest.push({
+        issueId: issueData.issueId,
+        checkId: editCheck.checkId,
+        checkName: editCheck.checkName,
+      });
+    });
+
+    const newIssueCheckRequest: RequestCreateIssueCheck[] = [];
+    newIssueChecks.forEach(async (newCheck: TmpCreateIssueCheck, index: number) => {
+      newIssueCheckRequest.push({
+        issueId: issueData.issueId,
+        checkName: newCheck.checkName
+      });
+    });
+
     const updateIssueResponse: commonModel.Message = await kanbanService.updateIssueName(updateIssueRequest);
     if (!updateIssueResponse || (updateIssueResponse && !updateIssueResponse.msId)) {
       alert(updateIssueResponse ? updateIssueResponse.msContent : 'fail');
@@ -137,23 +156,6 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
       setEditOrNot(false);
       alert(updateIssueResponse.msContent);
     }
-
-    issueData.issueChecks && issueData.issueChecks.forEach(async (editCheck: ResponseRetrieveIssueCheck, index: number) => {
-      const editIssueCheckRequest: RequestUpdateIssueCheckName = {
-        issueId: issueData.issueId,
-        checkId: editCheck.checkId,
-        checkName: editCheck.checkName,
-      }
-      const editIssueCheckResponse: commonModel.Message = await kanbanService.updateIssueCheckName(editIssueCheckRequest);
-    });
-
-    newIssueChecks.forEach(async (newCheck: TmpCreateIssueCheck, index: number) => {
-      const insertRequest: RequestCreateIssueCheck = {
-        issueId: issueData.issueId,
-        checkName: newCheck.checkName
-      }
-      const insertIssueCheckResponse: commonModel.Message = await kanbanService.insertIssueCheck(insertRequest);
-    });
   };
 
   useEffect(() => {

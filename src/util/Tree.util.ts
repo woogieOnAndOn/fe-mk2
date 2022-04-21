@@ -1,6 +1,6 @@
-import { Tree } from "../model/tree.model";
+import * as Tree from "../model/tree.model";
 
-export const findAndUpdateTree = (trees: Tree[], targetTree: Tree): Tree[] => {
+export const findAndUpdateTree = (trees: Tree.RetrieveRes[], targetTree: Tree.RetrieveRes): Tree.RetrieveRes[] => {
   let find = false;
   for (let i = 0; i < trees.length; i ++) {
     if (trees[i].id === targetTree.id) {
@@ -20,7 +20,7 @@ export const findAndUpdateTree = (trees: Tree[], targetTree: Tree): Tree[] => {
   }
 }
 
-export const findTreeById = (trees: Tree[], targetId: number): Tree | null => {
+export const findTreeById = (trees: Tree.RetrieveRes[], targetId: number): Tree.RetrieveRes | null => {
   let find = false;
   for (let i = 0; i < trees.length; i ++) {
     if (trees[i].id === targetId) {
@@ -32,7 +32,7 @@ export const findTreeById = (trees: Tree[], targetId: number): Tree | null => {
   if (!find) {
     for (let tree of trees) {
       if (tree.children) {
-        const result: Tree | null = findTreeById(tree.children, targetId);
+        const result: Tree.RetrieveRes | null = findTreeById(tree.children, targetId);
         if (result) {
           return result;
         }
@@ -43,9 +43,9 @@ export const findTreeById = (trees: Tree[], targetId: number): Tree | null => {
   return null;
 }
 
-export const findTreePathById = (trees: Tree[], targetId: number): string[] => {
+export const findTreePathById = (trees: Tree.RetrieveRes[], targetId: number): string[] => {
   const paths: string[] = [];
-  const targetTree: Tree | null = findTreeById(trees, targetId);
+  const targetTree: Tree.RetrieveRes | null = findTreeById(trees, targetId);
 
   if (!targetTree) {
     return [];
@@ -55,7 +55,7 @@ export const findTreePathById = (trees: Tree[], targetId: number): string[] => {
   let parentId = targetTree.parent;
 
   while(depth > 0) {
-    const parentTree: Tree | null = findTreeById(trees, parentId);
+    const parentTree: Tree.RetrieveRes | null = findTreeById(trees, parentId);
     if (!parentTree) break;
 
     paths.unshift(parentTree.name);

@@ -7,7 +7,7 @@ import { Icon, Button, Container, Checkbox, Form, Input, Radio, Select, TextArea
 
 import { TreeContext, TreeProvider } from '../../contexts/TreeContext';
 import { TreeActionType } from '../../reducer/tree/actions'
-import { Tree, ActionType } from '../../model/tree.model';
+import * as Tree from '../../model/tree.model';
 
 import TreeSection from './component/TreeSection';
 import PathSection from './component/PathSection';
@@ -62,7 +62,7 @@ const MainPage: React.FC = (): ReactElement => {
             <EditSection />
 
             {/* 파일 조회 뷰 */}
-            <div className='fileView' style={{display: treeState.actionType !== ActionType.READ ? 'none' : 'block'}}>
+            <div className='fileView' style={{display: treeState.actionType !== Tree.ActionType.READ ? 'none' : 'block'}}>
               <div dangerouslySetInnerHTML={{__html: contentHtml}}></div>
             </div>
           </Segment>
