@@ -11,3 +11,7 @@
   border-radius: 5px;
   border: 1px dashed gray;
 }
+
+#MovableItem pre {
+  white-space: pre-wrap;
+}
