@@ -7,9 +7,9 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import * as Issue from '../../model/issue.model'
 import KanbanService from '../../service/kanban.service';
 import * as commonModel from '../../model/common.model';
-
 import AcceptableColumn from './component/AcceptableColumn';
 import MovableItem from './component/MovableItem';
+import ApiResultExecutor from '../../scripts/common/ApiResultExecutor';
 
 const KanbanPage = () => {
   const kanbanService = new KanbanService();
@@ -20,14 +20,8 @@ const KanbanPage = () => {
 
   useEffect(() => {
     const retrieveIssue = async () => {
-      let response = [];
       const result: commonModel.Message = await kanbanService.retrieveIssue();
-      if (result && result.msId) {
-        response = result.msObject;
-        setIssues(response);
-      } else {
-        alert(result.msContent);
-      }
+      ApiResultExecutor(result, false, () => setIssues(result.msObject));
     };
     retrieveIssue();
   // eslint-disable-next-line react-hooks/exhaustive-deps

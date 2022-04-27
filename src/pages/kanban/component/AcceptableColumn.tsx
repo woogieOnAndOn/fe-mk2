@@ -6,6 +6,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import * as Issue from '../../../model/issue.model'
 import KanbanService from '../../../service/kanban.service';
 import * as commonModel from '../../../model/common.model';
+import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor';
 import './MovableItem.css'
 
 interface ColumnProps {
@@ -43,28 +44,26 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
         issueState: issueState
       });
 
-      if (updateResult.msId) {
-        let updateUseTimeResult: commonModel.Message = {
-          msId: 1,
-          msContent: '',
-        };
-        switch (issueState) {
-          case Issue.State.WAIT:
-            if (item.issueState === Issue.State.START) updateUseTimeResult = await kanbanService.updateUseTime({ issueId: item.issueId });
-            break;
-          case Issue.State.START:
-            break;
-          case Issue.State.COMPLETE:
-            if (item.issueState === Issue.State.START) updateUseTimeResult = await kanbanService.updateUseTime({ issueId: item.issueId });
-            break;
-          case Issue.State.END:
-            break;
-          default: break;
+      ApiResultExecutor(updateResult, false, async () => {
+        if (updateResult.msId) {
+          let updateUseTimeResult: commonModel.Message = {
+            msId: 1,
+            msContent: '',
+          };
+          switch (issueState) {
+            case Issue.State.WAIT:
+            case Issue.State.COMPLETE:
+              if (item.issueState === Issue.State.START) {
+                updateUseTimeResult = await kanbanService.updateUseTime({ issueId: item.issueId });
+                ApiResultExecutor(updateUseTimeResult);
+              }
+              break;
+            default: 
+              break;
+          }
         }
-        if (!updateUseTimeResult) alert(updateResult.msContent);
-      } else {
-        alert(updateResult.msContent);
-      }
+      });
+
       item.issueState = issueState;
       let targetIndex = 0;
       let tmpIssues = issues;
@@ -106,22 +105,7 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
       issueName: issueAndCheck,
     }
     const response: commonModel.Message = await kanbanService.insertIssue(request);
-    if (response.msId) {
-      const returnedObject = response.msObject;
-      const insertedIssue: Issue.RetrieveRes = {
-        issueId: returnedObject.id,
-        issueName: returnedObject.issueName,
-        issueState: Issue.State.WAIT,
-        useTime: 0.0,
-        creationDate: '',
-        issueChecks: []
-      };
-      let tmpIssues: Issue.RetrieveRes[] = issues;
-      tmpIssues.push(insertedIssue);
-      setIssueAndCheck('');
-      setIssues(tmpIssues);
-      setReset(true);
-    }
+    ApiResultExecutor(response);
   };
 
   return (

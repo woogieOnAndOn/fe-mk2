@@ -6,6 +6,7 @@ import * as Issue from '../../../model/issue.model'
 import KanbanService from '../../../service/kanban.service';
 import * as commonModel from '../../../model/common.model';
 import * as IssueCheck from '../../../model/issueCheck.model';
+import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor';
 
 interface ItemProps {
   issues: Issue.RetrieveRes[];
@@ -43,9 +44,7 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
       checkId: checkId,
     }
     const response: commonModel.Message = await kanbanService.updateIssueCheckCompleteYn(request);
-    if (!response || (response && !response.msId)) {
-      alert(response ? response.msContent : 'fail');
-    }
+    ApiResultExecutor(response);
   };
 
   const [{ isDragging }, drag] = useDrag(() => ({
@@ -76,13 +75,13 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
       issueId: issueId
     };
     const response: commonModel.Message = await kanbanService.deleteIssue(request);
-    if (response.msId) {
+    ApiResultExecutor(response, false, () => {
       let tmpIssues: Issue.RetrieveRes[] = issues;
       const issueIds: number[] = tmpIssues.map((issue) => issue.issueId);
       tmpIssues.splice(issueIds.indexOf(issueId), 1);
       setIssues(tmpIssues);
       setReset(true);
-    }
+    });
   };
 
   const handleOnchangeIssueName = (e: any) => {
@@ -192,12 +191,7 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
     };
 
     const updateIssueResponse: commonModel.Message = await kanbanService.updateIssueName(updateIssueRequest);
-    if (!updateIssueResponse || (updateIssueResponse && !updateIssueResponse.msId)) {
-      alert(updateIssueResponse ? updateIssueResponse.msContent : 'fail');
-    } else {
-      setEditOrNot(false);
-      alert(updateIssueResponse.msContent);
-    }
+    ApiResultExecutor(updateIssueResponse, true, () => setEditOrNot(false));
   };
 
   useEffect(() => {
@@ -290,7 +284,7 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
         <Card fluid>
           <Label color='teal' floating>{issueData.useTime}</Label>
           <Card.Content>
-            <div ref={drag}>
+            <div ref={drag} style={{ opacity }}>
               <pre>{issueData.issueName}</pre>
               {issueData.issueChecks && issueData.issueChecks.length > 0 && issueData.issueChecks.map((check: IssueCheck.RetrieveRes, index) => (
                 <div key={check.checkId}>
