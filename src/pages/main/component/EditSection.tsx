@@ -9,6 +9,7 @@ import * as Tree from '../../../model/tree.model';
 import { Message } from '../../../model/common.model';
 import parseMd from '../../../util/Parser.util';
 import { findAndUpdateTree } from '../../../util/Tree.util';
+import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor';
 
 interface PropTypes {  }
 
@@ -46,7 +47,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
     };
 
     const result: Message = await treeService.insertTree(request);
-    if (result && result.msId) {
+    ApiResultExecutor(result, false, () => {
       const insertedTree: Tree.RetrieveRes = result.msObject;
       treeDispatch({
         type: TreeActionType.SET_UPSERT_TREE,
@@ -65,44 +66,34 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         title: '',
         contentMd: '',
       });
-    } else {
-      alert(result.msContent);
-    }
+    });
   }
 
   const updateTree = async (afterType= 'continue') => {
-    try {
-      const request: Tree.UpdateReq = {
-        id: treeState.targetTree.id,
-        name: title,
-        content: contentMd,
-        secret: secret,
-      };
-  
-      const result: Message = await treeService.updateTree(request);
-      if (result && result.msId) {
-        alert(result.msContent);
-        let tmpState: Tree.RetrieveRes[] = treeState.datas;
-        const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(tmpState, result.msObject);
-        
+    const request: Tree.UpdateReq = {
+      id: treeState.targetTree.id,
+      name: title,
+      content: contentMd,
+      secret: secret,
+    };
+
+    const result: Message = await treeService.updateTree(request);
+    ApiResultExecutor(result, true, () => {
+      let tmpState: Tree.RetrieveRes[] = treeState.datas;
+      const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(tmpState, result.msObject);
+      
+      treeDispatch({
+        type: TreeActionType.SET_SEARCH_RESULT,
+        datas: updatedTrees
+      });
+      if (afterType === 'finish') {
         treeDispatch({
-          type: TreeActionType.SET_SEARCH_RESULT,
-          datas: updatedTrees
+          type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
+          targetTree: result.msObject,
+          actionType: Tree.ActionType.READ
         });
-        if (afterType === 'finish') {
-          treeDispatch({
-            type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
-            targetTree: result.msObject,
-            actionType: Tree.ActionType.READ
-          });
-        }
-      } else {
-        alert(result.msContent);
       }
-    } catch (err) {
-      window.location.reload();
-      throw err;
-    }
+    });
   }
 
   const handleChangeFile = async (event: any) => {

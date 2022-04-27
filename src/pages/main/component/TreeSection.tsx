@@ -9,6 +9,7 @@ import { Message } from '../../../model/common.model';
 import * as Tree from '../../../model/tree.model';
 import parseMd from '../../../util/Parser.util';
 import { findAndUpdateTree, findTreeById } from '../../../util/Tree.util';
+import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor';
 
 interface PropTypes {  }
 
@@ -52,13 +53,11 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
   });
 
   const retrieveTree = async (searchCondition: any) => {
-    let response = [];
+    let response: Tree.RetrieveRes[] = [];
     const result: Message = await treeService.retrieveTree(searchCondition);
-    if (result && result.msId) {
+    ApiResultExecutor(result, false, () => {
       response = result.msObject;
-    } else {
-      alert(result.msContent);
-    }
+    });
     return response;
   }
 
@@ -69,9 +68,8 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     };
 
     const result: Message = await treeService.deleteTree(request);
-    if (result && result.msId) {
+    ApiResultExecutor(result, false, () => {
       const parentTree: Tree.RetrieveRes | null = findTreeById(treeState.datas, data.parent);
-
       if (parentTree) {
         showDirectories(parentTree);
       } else {
@@ -83,9 +81,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
             });
           })
       }
-    } else {
-      alert(result.msContent);
-    }
+    });
   }
 
   const upTree = async (data: Tree.RetrieveRes) => {
@@ -98,9 +94,9 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     }
 
     const result: Message = await treeService.updateSeqTree(request);
-    if (result && result.msId) {
+    ApiResultExecutor(result, false, () => {
       const parentTree: Tree.RetrieveRes | null = findTreeById(treeState.datas, data.parent);
-
+  
       if (parentTree) {
         showDirectories(parentTree);
       } else {
@@ -112,9 +108,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
             });
           })
       }
-    } else {
-      alert(result.msContent);
-    }
+    });
   };
 
   const downTree = async (data: Tree.RetrieveRes) => {
@@ -127,9 +121,9 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     }
 
     const result: Message = await treeService.updateSeqTree(request);
-    if (result && result.msId) {
+    ApiResultExecutor(result, false, () => {
       const parentTree: Tree.RetrieveRes | null = findTreeById(treeState.datas, data.parent);
-
+  
       if (parentTree) {
         showDirectories(parentTree);
       } else {
@@ -141,9 +135,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
             });
           })
       }
-    } else {
-      alert(result.msContent);
-    }
+    });
   };
 
   // 액션 버튼 보이기
