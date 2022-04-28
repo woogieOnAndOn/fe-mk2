@@ -51,15 +51,13 @@ export const findTreePathById = (trees: Tree.RetrieveRes[], targetId: number): s
     return [];
   }
 
-  let depth = targetTree.depth;
   let parentId = targetTree.parent;
 
-  while(depth > 0) {
+  while(parentId !== 0) {
     const parentTree: Tree.RetrieveRes | null = findTreeById(trees, parentId);
     if (!parentTree) break;
 
     paths.unshift(parentTree.name);
-    depth -= 1;
     parentId = parentTree.parent;
   }
   

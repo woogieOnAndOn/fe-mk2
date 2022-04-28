@@ -3,14 +3,12 @@ export interface Tree {
   type        :Type;
   name        :string;
   content     :string;
-  depth       :number;
   parent      :number;
   secret      :number;          // 0: piblic, 1: private
   children    :Tree[];
 }
 
 export interface RetrieveReq {
-  depth : number;
   parent: number;
   secret: number;
 }
@@ -19,7 +17,6 @@ export interface CreateReq {
   type     :number;
   name     :string;
   content  :string;
-  depth    :number;
   parent   :number;
   secret   :number;          // 0: piblic, 1: private
 }
@@ -41,7 +38,6 @@ export interface RetrieveRes {
   type     :number;
   name     :string;
   content  :string;
-  depth    :number;
   parent   :number;
   secret   :number;          // 0: piblic, 1: private
   children    :Tree[];
@@ -50,7 +46,6 @@ export interface RetrieveRes {
 export interface UpdateSeqReq {
   id       ?:number;
   type     ?:number;            // 10: folder, 20: file
-  depth    ?:number;
   parent   ?:number;
   upDown   ?:UpDown;
 }

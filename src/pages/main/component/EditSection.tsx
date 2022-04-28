@@ -41,7 +41,6 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
       type: type,
       name: title,
       content: contentMd,
-      depth: treeState.targetTree.depth + 1 || 1,
       parent: treeState.targetTree.id || 0,
       secret: secret,
     };

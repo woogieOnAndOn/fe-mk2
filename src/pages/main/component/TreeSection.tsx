@@ -22,7 +22,6 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     type: Tree.Type.FORDER,
     name: '',
     content: '',
-    depth: 0,
     parent: 0,
     secret: 0,
     children: [],
@@ -30,14 +29,13 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
 
   const showDirectories = (async (data: Tree.RetrieveRes) => {
     const newSearchCondition: Tree.RetrieveReq = {
-      depth: data.depth + 1,
       parent: data.id,
       secret: 0,
     };
     retrieveTree(newSearchCondition)
       .then(response => {
         let updatedTrees: Tree.RetrieveRes[] = [];
-        if (newSearchCondition.depth === 1) {
+        if (newSearchCondition.parent === 0) {
           updatedTrees = response;
         } else {
           data.children = response;
@@ -88,7 +86,6 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     const request: Tree.UpdateSeqReq = {
       id: data.id,
       type: data.type,
-      depth: data.depth,
       parent: data.parent,
       upDown: Tree.UpDown.UP,
     }
@@ -115,7 +112,6 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     const request: Tree.UpdateSeqReq = {
       id: data.id,
       type: data.type,
-      depth: data.depth,
       parent: data.parent,
       upDown: Tree.UpDown.DOWN,
     }
