@@ -20,10 +20,9 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
   const [inputs, setInputs] = useState({
     title: '',
     contentMd: '',
-    secret: 0,
   });
 
-  const {title, contentMd, secret} = inputs;
+  const {title, contentMd} = inputs;
 
   const handleOnChange = (e: any) => {
     const { name, value } = e.target;
@@ -42,7 +41,6 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
       name: title,
       content: contentMd,
       parent: treeState.targetTree.id || 0,
-      secret: secret,
     };
 
     const result: Message = await treeService.insertTree(request);
@@ -73,7 +71,6 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
       id: treeState.targetTree.id,
       name: title,
       content: contentMd,
-      secret: secret,
     };
 
     const result: Message = await treeService.updateTree(request);
@@ -123,7 +120,6 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         ...inputs,
         title: treeState.targetTree.name,
         contentMd: treeState.targetTree.content,
-        secret: treeState.targetTree.secret,
       });
       setType(treeState.targetTree.type);
       asyncParseMd(treeState.targetTree.content).then(res => {
@@ -134,7 +130,6 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         ...inputs,
         title: '',
         contentMd: '',
-        secret: 0,
       });
       setType(Tree.Type.FILE);
       setContentHtml('');

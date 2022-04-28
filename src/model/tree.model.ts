@@ -4,13 +4,11 @@ export interface Tree {
   name        :string;
   content     :string;
   parent      :number;
-  secret      :number;          // 0: piblic, 1: private
   children    :Tree[];
 }
 
 export interface RetrieveReq {
   parent: number;
-  secret: number;
 }
 
 export interface CreateReq {
@@ -18,14 +16,12 @@ export interface CreateReq {
   name     :string;
   content  :string;
   parent   :number;
-  secret   :number;          // 0: piblic, 1: private
 }
 
 export interface UpdateReq {
   id       :number;
   name     :string;
   content  :string;
-  secret   :number;          // 0: piblic, 1: private
 }
 
 export interface DeleteReq {
@@ -39,7 +35,6 @@ export interface RetrieveRes {
   name     :string;
   content  :string;
   parent   :number;
-  secret   :number;          // 0: piblic, 1: private
   children    :Tree[];
 }
 

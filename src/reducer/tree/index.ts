@@ -9,7 +9,6 @@ export const initialState: TreeState = {
     name: '',
     content: '',
     parent: 0,
-    secret: 0,
     children: [],
   },
   searchIndex: 0,
@@ -22,7 +21,6 @@ export const initialState: TreeState = {
     name: '',
     content: '',
     parent: 0,
-    secret: 0,
     children: [],
   },
   upsertTree: {
@@ -31,7 +29,6 @@ export const initialState: TreeState = {
     name: '',
     content: '',
     parent: 0,
-    secret: 0,
     children: [],
   }
 }

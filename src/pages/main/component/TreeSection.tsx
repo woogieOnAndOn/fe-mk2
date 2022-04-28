@@ -23,14 +23,12 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     name: '',
     content: '',
     parent: 0,
-    secret: 0,
     children: [],
   };
 
   const showDirectories = (async (data: Tree.RetrieveRes) => {
     const newSearchCondition: Tree.RetrieveReq = {
       parent: data.id,
-      secret: 0,
     };
     retrieveTree(newSearchCondition)
       .then(response => {
