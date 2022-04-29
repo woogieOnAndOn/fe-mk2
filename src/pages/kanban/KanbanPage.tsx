@@ -9,7 +9,7 @@ import KanbanService from '../../service/kanban.service';
 import * as commonModel from '../../model/common.model';
 import AcceptableColumn from './component/AcceptableColumn';
 import MovableItem from './component/MovableItem';
-import ApiResultExecutor from '../../scripts/common/ApiResultExecutor';
+import ApiResultExecutor from '../../scripts/common/ApiResultExecutor.util';
 
 const KanbanPage = () => {
   const kanbanService = new KanbanService();

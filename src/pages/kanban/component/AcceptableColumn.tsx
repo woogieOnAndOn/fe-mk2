@@ -6,7 +6,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import * as Issue from '../../../model/issue.model'
 import KanbanService from '../../../service/kanban.service';
 import * as commonModel from '../../../model/common.model';
-import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor';
+import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor.util';
 import './MovableItem.css'
 
 interface ColumnProps {

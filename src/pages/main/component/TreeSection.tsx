@@ -7,8 +7,8 @@ import TreeService from '../../../service/tree.service';
 
 import { Message } from '../../../model/common.model';
 import * as Tree from '../../../model/tree.model';
-import { findAndUpdateTree, findTreeById } from '../../../util/Tree.util';
-import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor';
+import { findAndUpdateTree, findTreeById } from '../../../scripts/tree/Tree.util';
+import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor.util';
 
 interface PropTypes {  }
 

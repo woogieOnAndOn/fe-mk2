@@ -1,4 +1,4 @@
-import * as Tree from "../model/tree.model";
+import * as Tree from "../../model/tree.model";
 
 export const findAndUpdateTree = (trees: Tree.RetrieveRes[], targetTree: Tree.RetrieveRes): Tree.RetrieveRes[] => {
   let find = false;

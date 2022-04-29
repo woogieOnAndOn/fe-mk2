@@ -14,7 +14,7 @@ import PathSection from './component/PathSection';
 import EditSection from './component/EditSection';
 import { useContext } from 'react';
 
-import parseMd from '../../util/Parser.util';
+import parseMd from '../../scripts/common/Parser.util';
 
 const MainPage: React.FC = (): ReactElement => {
   const { treeState, treeDispatch } = useContext(TreeContext);

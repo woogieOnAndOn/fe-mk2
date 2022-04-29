@@ -6,7 +6,7 @@ import * as Issue from '../../../model/issue.model'
 import KanbanService from '../../../service/kanban.service';
 import * as commonModel from '../../../model/common.model';
 import * as IssueCheck from '../../../model/issueCheck.model';
-import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor';
+import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor.util';
 
 interface ItemProps {
   issues: Issue.RetrieveRes[];

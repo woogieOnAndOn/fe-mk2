@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Icon, Step } from 'semantic-ui-react'
 import { TreeContext } from '../../../contexts/TreeContext';
 import * as Tree from '../../../model/tree.model';
-import { findTreePathById } from '../../../util/Tree.util';
+import { findTreePathById } from '../../../scripts/tree/Tree.util';
 
 interface PropTypes {  }
 

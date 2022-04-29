@@ -7,9 +7,9 @@ import { TreeActionType } from '../../../reducer/tree/actions';
 import TreeService from '../../../service/tree.service';
 import * as Tree from '../../../model/tree.model';
 import { Message } from '../../../model/common.model';
-import parseMd from '../../../util/Parser.util';
-import { findAndUpdateTree } from '../../../util/Tree.util';
-import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor';
+import parseMd from '../../../scripts/common/Parser.util';
+import { findAndUpdateTree } from '../../../scripts/tree/Tree.util';
+import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor.util';
 
 interface PropTypes {  }
 
