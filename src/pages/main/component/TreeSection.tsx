@@ -16,7 +16,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
   const { treeState, treeDispatch } = useContext(TreeContext);
   const treeService = new TreeService();
 
-  const initialTree = {
+  const initialTree: Tree.RetrieveRes = {
     id: 0,
     type: Tree.Type.FORDER,
     name: '',
@@ -25,7 +25,10 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     children: [],
   };
 
-  const showDirectories = (async (data: Tree.RetrieveRes) => {
+  const folderTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === Tree.Type.FORDER).length;
+  const fileTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === Tree.Type.FILE).length;
+
+  const showDirectories = async (data: Tree.RetrieveRes) => {
     const newSearchCondition: Tree.RetrieveReq = {
       parent: data.id,
     };
@@ -45,7 +48,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
           datas: updatedTrees
         });
       });
-  });
+  };
 
   const retrieveTree = async (searchCondition: any) => {
     let response: Tree.RetrieveRes[] = [];
@@ -90,17 +93,21 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     const result: Message = await treeService.updateSeqTree(request);
     ApiResultExecutor(result, false, () => {
       const parentTree: Tree.RetrieveRes | null = findTreeById(treeState.datas, data.parent);
-  
       if (parentTree) {
-        showDirectories(parentTree);
-      } else {
-        retrieveTree({})
-          .then(response => {
-            treeDispatch({
-              type: TreeActionType.SET_SEARCH_RESULT,
-              datas: response
-            });
-          })
+        const children: Tree.RetrieveRes[] = parentTree.children;
+        let targetIndex = 0;
+        children.forEach((tree: Tree.RetrieveRes, index: number) => {
+          tree.id === data.id && (targetIndex = index);
+        })
+        children[targetIndex] = children[targetIndex-1];
+        children[targetIndex-1] = data;
+        parentTree.children = children;
+        
+        const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(treeState.datas, parentTree);
+        treeDispatch({
+          type: TreeActionType.SET_SEARCH_RESULT,
+          datas: updatedTrees
+        });
       }
     });
   };
@@ -116,17 +123,21 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     const result: Message = await treeService.updateSeqTree(request);
     ApiResultExecutor(result, false, () => {
       const parentTree: Tree.RetrieveRes | null = findTreeById(treeState.datas, data.parent);
-  
       if (parentTree) {
-        showDirectories(parentTree);
-      } else {
-        retrieveTree({})
-          .then(response => {
-            treeDispatch({
-              type: TreeActionType.SET_SEARCH_RESULT,
-              datas: response
-            });
-          })
+        const children: Tree.RetrieveRes[] = parentTree.children;
+        let targetIndex = 0;
+        children.forEach((tree: Tree.RetrieveRes, index: number) => {
+          tree.id === data.id && (targetIndex = index);
+        })
+        children[targetIndex] = children[targetIndex+1];
+        children[targetIndex+1] = data;
+        parentTree.children = children;
+        
+        const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(treeState.datas, parentTree);
+        treeDispatch({
+          type: TreeActionType.SET_SEARCH_RESULT,
+          datas: updatedTrees
+        });
       }
     });
   };
@@ -240,20 +251,9 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     )
   }
 
-  const folderTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === Tree.Type.FORDER).length;
-  const fileTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === Tree.Type.FILE).length;
-
   return (
     <>
-      <Button color='black' onClick={() => {
-        retrieveTree({})
-          .then(response => {
-            treeDispatch({
-              type: TreeActionType.SET_SEARCH_RESULT,
-              datas: response
-            });
-          });
-      }} >
+      <Button color='black' onClick={() => showDirectories(initialTree)} >
         user
       </Button>
       <Button.Group basic size='mini'>
