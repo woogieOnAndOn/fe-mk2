@@ -75,8 +75,7 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
 
     const result: Message = await treeService.updateTree(request);
     ApiResultExecutor(result, true, () => {
-      let tmpState: Tree.RetrieveRes[] = treeState.datas;
-      const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(tmpState, result.msObject);
+      const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(treeState.datas, result.msObject);
       
       treeDispatch({
         type: TreeActionType.SET_SEARCH_RESULT,
