@@ -28,6 +28,19 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
   const folderTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === Tree.Type.FORDER).length;
   const fileTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === Tree.Type.FILE).length;
 
+  const hadnleOnClickButton = (data: Tree.RetrieveRes) => {
+    if (data.children && data.children.length > 0) {
+      data.children = [];
+      const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(treeState.datas, data);
+      treeDispatch({
+        type: TreeActionType.SET_SEARCH_RESULT,
+        datas: updatedTrees
+      });
+    } else {
+      showDirectories(data);
+    }
+  }
+
   const showDirectories = async (data: Tree.RetrieveRes) => {
     const newSearchCondition: Tree.RetrieveReq = {
       parent: data.id,
@@ -214,7 +227,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
           {
             [Tree.Type.FORDER]:
               <div> 
-                <Button color='orange' onClick={() => showDirectories(data)} onContextMenu={(e: any) => showButtonGroup(e, data)}>
+                <Button color='orange' onClick={() => hadnleOnClickButton(data)} onContextMenu={(e: any) => showButtonGroup(e, data)}>
                   <Icon name='folder open outline' />
                   {data.name}
                 </Button>
