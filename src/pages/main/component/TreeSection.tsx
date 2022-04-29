@@ -59,7 +59,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     return response;
   }
 
-  const deleteTree = async (data: any) => {
+  const deleteTree = async (data: Tree.RetrieveRes) => {
     const request = {
       id: data.id,
       type: data.type,
@@ -69,15 +69,19 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     ApiResultExecutor(result, false, () => {
       const parentTree: Tree.RetrieveRes | null = findTreeById(treeState.datas, data.parent);
       if (parentTree) {
-        showDirectories(parentTree);
-      } else {
-        retrieveTree({})
-          .then(response => {
-            treeDispatch({
-              type: TreeActionType.SET_SEARCH_RESULT,
-              datas: response
-            });
-          })
+        const children: Tree.RetrieveRes[] = parentTree.children;
+        let targetIndex = 0;
+        children.forEach((tree: Tree.RetrieveRes, index: number) => {
+          tree.id === data.id && (targetIndex = index);
+        })
+        children.splice(targetIndex, 1);
+        parentTree.children = children;
+
+        const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(treeState.datas, parentTree);
+        treeDispatch({
+          type: TreeActionType.SET_SEARCH_RESULT,
+          datas: updatedTrees
+        });
       }
     });
   }
