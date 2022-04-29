@@ -36,6 +36,7 @@ export interface RetrieveRes {
   content  :string;
   parent   :number;
   children    :Tree[];
+  showBtnGroup? : boolean;
 }
 
 export interface UpdateSeqReq {

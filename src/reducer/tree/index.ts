@@ -13,7 +13,6 @@ export const initialState: TreeState = {
   },
   searchIndex: 0,
   datas: [],
-  showActionBtns: false,
   actionType: Tree.ActionType.CREATE,
   targetTree: {
     id: 0,
@@ -66,12 +65,6 @@ export const reducer = (treeState: TreeState, action: TreeAction) => {
         searchCondition: action.searchCondition,
         searchIndex: action.searchIndex,
         upsertTree: action.upsertTree,
-      };
-    }
-    case TreeActionType.SET_SHOW_ACTION_BTNS: {
-      return {
-        ...treeState,
-        showActionBtns: action.showActionBtns
       };
     }
     default:

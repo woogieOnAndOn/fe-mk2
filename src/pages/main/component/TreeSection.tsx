@@ -7,7 +7,6 @@ import TreeService from '../../../service/tree.service';
 
 import { Message } from '../../../model/common.model';
 import * as Tree from '../../../model/tree.model';
-import parseMd from '../../../util/Parser.util';
 import { findAndUpdateTree, findTreeById } from '../../../util/Tree.util';
 import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor';
 
@@ -132,15 +131,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     });
   };
 
-  // 액션 버튼 보이기
-  const handleShowActionBtns = () => {
-    treeDispatch({
-      type: TreeActionType.SET_SHOW_ACTION_BTNS,
-      showActionBtns: !treeState.showActionBtns,
-    });
-  };
-
-  // 창 띄우기 
+  // show
   const showCreate = async (data: Tree.RetrieveRes) => {
     treeDispatch({
       type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
@@ -174,7 +165,17 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
       deleteTree(data);
     }
   }
-  // ===================================================창띄우기
+
+  const showButtonGroup = (e:any , data: Tree.RetrieveRes) => {
+    e.preventDefault();
+    data.showBtnGroup = !data.showBtnGroup;
+    const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(treeState.datas, data);
+    treeDispatch({
+      type: TreeActionType.SET_SEARCH_RESULT,
+      datas: updatedTrees
+    });
+  }
+  // -- show
 
   useEffect(() => {
     // console.log('useEffect');
@@ -198,31 +199,35 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
           {
             [Tree.Type.FORDER]:
               <div> 
-                <Button color='orange' onClick={() => showDirectories(data)}>
+                <Button color='orange' onClick={() => showDirectories(data)} onContextMenu={(e: any) => showButtonGroup(e, data)}>
                   <Icon name='folder open outline' />
                   {data.name}
                 </Button>
-                <Button.Group basic size='mini' style={{display: treeState.showActionBtns || 'none'}}>
-                  <Button icon='plus square outline' onClick={() => showCreate(data)} />
-                  <Button icon='edit outline' onClick={() => showEdit(data)} />
-                  <Button icon='trash alternate outline' onClick={() => showDelete(data)} />
-                  <Button icon='angle up' onClick={() => upTree(data)} style={{display: index === 0 && 'none'}} />
-                  <Button icon='angle down' onClick={() => downTree(data)} style={{display: index === folderTotalCount-1 && 'none'}} />
-                </Button.Group>
+                {data.showBtnGroup && 
+                  <Button.Group basic size='mini'>
+                    <Button icon='plus square outline' onClick={() => showCreate(data)} />
+                    <Button icon='edit outline' onClick={() => showEdit(data)} />
+                    <Button icon='trash alternate outline' onClick={() => showDelete(data)} />
+                    <Button icon='angle up' onClick={() => upTree(data)} style={{display: index === 0 && 'none'}} />
+                    <Button icon='angle down' onClick={() => downTree(data)} style={{display: index === folderTotalCount-1 && 'none'}} />
+                  </Button.Group>
+                }
               </div>
             ,
             [Tree.Type.FILE]:
               <div>
-                <Button color='blue' onClick={() => showFile(data)} >
+                <Button color='blue' onClick={() => showFile(data)} onContextMenu={(e: any) => showButtonGroup(e, data)}>
                   <Icon name='file alternate outline' />
                   {data.name}
                 </Button>
-                <Button.Group basic size='mini' style={{display: treeState.showActionBtns || 'none'}}>
-                  <Button icon='edit outline' onClick={() => showEdit(data)} />
-                  <Button icon='trash alternate outline' onClick={() => showDelete(data)} />
-                  <Button icon='angle up' onClick={() => upTree(data)} style={{display: index === folderTotalCount && 'none'}} />
-                  <Button icon='angle down' onClick={() => downTree(data)} style={{display: index === folderTotalCount+fileTotalCount-1 && 'none'}} />
-                </Button.Group>
+                {data.showBtnGroup && 
+                  <Button.Group basic size='mini'>
+                    <Button icon='edit outline' onClick={() => showEdit(data)} />
+                    <Button icon='trash alternate outline' onClick={() => showDelete(data)} />
+                    <Button icon='angle up' onClick={() => upTree(data)} style={{display: index === folderTotalCount && 'none'}} />
+                    <Button icon='angle down' onClick={() => downTree(data)} style={{display: index === folderTotalCount+fileTotalCount-1 && 'none'}} />
+                  </Button.Group>
+                }
               </div>
           }[data.type]
         }
@@ -240,10 +245,6 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
 
   return (
     <>
-      <Button.Group widths='2' color='green' style={{ margin: "0px 0px 8px 0px"}}>
-        <Button onClick={() => handleShowActionBtns()}>수정</Button>
-        <Button>검색</Button>
-      </Button.Group>
       <Button color='black' onClick={() => {
         retrieveTree({})
           .then(response => {
@@ -255,7 +256,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
       }} >
         user
       </Button>
-      <Button.Group basic size='mini' style={{display: treeState.showActionBtns || 'none'}}>
+      <Button.Group basic size='mini'>
         <Button icon='plus square outline' onClick={() => showCreate(initialTree)} />
       </Button.Group>
       {treeState.datas && treeState.datas!.map((data, index) => (
