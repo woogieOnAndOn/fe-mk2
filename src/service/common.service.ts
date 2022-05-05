@@ -17,6 +17,7 @@ export default class CommonService {
     this.config.url = this.checkServiceUrl(service) + endPoint;
     this.config.params = params;
     this.config.data = requestBody;
+    service === ApiServiceName.MK4 ? this.config.withCredentials = false : this.config.withCredentials = true;
     return await axios.request(this.config);
   }
 
