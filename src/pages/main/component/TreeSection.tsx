@@ -28,41 +28,6 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
   const folderTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === Tree.Type.FORDER).length;
   const fileTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === Tree.Type.FILE).length;
 
-  const hadnleOnClickButton = (data: Tree.RetrieveRes) => {
-    if (data.children && data.children.length > 0) {
-      data.children = [];
-      const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(treeState.datas, data);
-      treeDispatch({
-        type: TreeActionType.SET_SEARCH_RESULT,
-        datas: updatedTrees
-      });
-    } else {
-      showDirectories(data);
-    }
-  }
-
-  const showDirectories = async (data: Tree.RetrieveRes) => {
-    const newSearchCondition: Tree.RetrieveReq = {
-      parent: data.id,
-    };
-    retrieveTree(newSearchCondition)
-      .then(response => {
-        let updatedTrees: Tree.RetrieveRes[] = [];
-        if (newSearchCondition.parent === 0) {
-          updatedTrees = response;
-        } else {
-          data.children = response;
-          let tmpState: Tree.RetrieveRes[] = treeState.datas;
-          updatedTrees = findAndUpdateTree(tmpState, data);
-        }
-        
-        treeDispatch({
-          type: TreeActionType.SET_SEARCH_RESULT,
-          datas: updatedTrees
-        });
-      });
-  };
-
   const retrieveTree = async (searchCondition: any) => {
     let response: Tree.RetrieveRes[] = [];
     const result: Message = await treeService.retrieveTree(searchCondition);
@@ -160,12 +125,17 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
   };
 
   // show
-  const showCreate = async (data: Tree.RetrieveRes) => {
-    treeDispatch({
-      type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
-      targetTree: data,
-      actionType: Tree.ActionType.CREATE
-    });
+  const showFolder = (data: Tree.RetrieveRes) => {
+    if (data.children && data.children.length > 0) {
+      data.children = [];
+      const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(treeState.datas, data);
+      treeDispatch({
+        type: TreeActionType.SET_SEARCH_RESULT,
+        datas: updatedTrees
+      });
+    } else {
+      showDirectories(data);
+    }
   }
 
   const showFile = async (data: Tree.RetrieveRes) => {
@@ -173,6 +143,14 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
       type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
       targetTree: data,
       actionType: Tree.ActionType.READ
+    });
+  }
+
+  const showCreate = async (data: Tree.RetrieveRes) => {
+    treeDispatch({
+      type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
+      targetTree: data,
+      actionType: Tree.ActionType.CREATE
     });
   }
 
@@ -203,6 +181,28 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
       datas: updatedTrees
     });
   }
+
+  const showDirectories = async (data: Tree.RetrieveRes) => {
+    const newSearchCondition: Tree.RetrieveReq = {
+      parent: data.id,
+    };
+    retrieveTree(newSearchCondition)
+      .then(response => {
+        let updatedTrees: Tree.RetrieveRes[] = [];
+        if (newSearchCondition.parent === 0) {
+          updatedTrees = response;
+        } else {
+          data.children = response;
+          let tmpState: Tree.RetrieveRes[] = treeState.datas;
+          updatedTrees = findAndUpdateTree(tmpState, data);
+        }
+        
+        treeDispatch({
+          type: TreeActionType.SET_SEARCH_RESULT,
+          datas: updatedTrees
+        });
+      });
+  };
   // -- show
 
   useEffect(() => {
@@ -227,7 +227,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
           {
             [Tree.Type.FORDER]:
               <div> 
-                <Button color='orange' onClick={() => hadnleOnClickButton(data)} onContextMenu={(e: any) => showButtonGroup(e, data)}>
+                <Button color='orange' onClick={() => showFolder(data)} onContextMenu={(e: any) => showButtonGroup(e, data)}>
                   <Icon name='folder open outline' />
                   {data.name}
                 </Button>
