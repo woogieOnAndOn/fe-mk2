@@ -29,6 +29,11 @@ export default class TreeService extends CommonService {
     return response.status === 200 ? response.data : null;
   }
 
+  async updateLocationTree<T>(request: Tree.UpdateLocationReq): Promise<T> {
+    const response = await this.callApi(ApiServiceName.MK2, 'PUT', `/tree/${request.parent}/children`, null, request);
+    return response.status === 200 ? response.data : null;
+  }
+
   async uploadFile<T>(request: any): Promise<T> {
     const response = await this.callApiForUpload(ApiServiceName.MK2, 'POST', `/upload`, null, request);
     return response.status === 200 ? response.data : null;

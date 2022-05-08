@@ -46,6 +46,11 @@ export interface UpdateSeqReq {
   upDown   ?:UpDown;
 }
 
+export interface UpdateLocationReq {
+  parent: number;
+  ids: number[];
+}
+
 export enum UpDown {
   UP = 'UP',
   DOWN = 'DOWN',
