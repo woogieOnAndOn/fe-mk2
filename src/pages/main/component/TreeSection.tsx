@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Icon, Button } from 'semantic-ui-react'
-import React, { useState, useEffect, useContext } from 'react';
+import { Icon, Button, Checkbox } from 'semantic-ui-react'
+import React, { useState, useEffect, useContext, FormEvent } from 'react';
 import { TreeContext, TreeProvider } from '../../../contexts/TreeContext';
 import { TreeActionType } from '../../../reducer/tree/actions';
 import TreeService from '../../../service/tree.service';
@@ -16,6 +16,8 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
   const { treeState, treeDispatch } = useContext(TreeContext);
   const treeService = new TreeService();
 
+  const [selectedTrees, setSelectedTrees] = useState<Tree.RetrieveRes[]>([]);
+
   const initialTree: Tree.RetrieveRes = {
     id: 0,
     type: Tree.Type.FORDER,
@@ -27,6 +29,15 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
 
   const folderTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === Tree.Type.FORDER).length;
   const fileTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === Tree.Type.FILE).length;
+
+  const changeHandler = (checkedTree: Tree.RetrieveRes) => {
+    const children = checkedTree.children ? checkedTree.children : [];
+    if (selectedTrees.includes(checkedTree)) {
+      setSelectedTrees(selectedTrees.filter((tree: Tree.RetrieveRes) => tree.id !== checkedTree.id && !children.map((child: Tree.RetrieveRes) => child.id).includes(tree.id)));
+    } else {
+      setSelectedTrees([...selectedTrees, checkedTree, ...children]);
+    }
+  };
 
   const retrieveTree = async (searchCondition: any) => {
     let response: Tree.RetrieveRes[] = [];
@@ -124,6 +135,45 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     });
   };
 
+  const updateLocationTree = async (data: Tree.RetrieveRes) => {
+    const selectedTreeForReq: Tree.RetrieveRes[] = [];
+    const selectedTreeIds = selectedTrees.map((tree: Tree.RetrieveRes) => tree.id);
+
+    selectedTrees.forEach((tree: Tree.RetrieveRes) => {
+      if (!selectedTreeIds.includes(tree.parent)) {
+        selectedTreeForReq.push(tree);
+      }
+    })
+
+    if (selectedTreeForReq.length === 0) return;
+
+    const request: Tree.UpdateLocationReq = {
+      parent: data.id,
+      ids: selectedTreeForReq.map((tree: Tree.RetrieveRes) => tree.id),
+    }
+
+    const result: Message = await treeService.updateLocationTree(request);
+    ApiResultExecutor(result, true, () => {
+      selectedTreeForReq.forEach((movedTree: Tree.RetrieveRes) => {
+        const parentTree: Tree.RetrieveRes | null = findTreeById(treeState.datas, movedTree.parent);
+        if (parentTree) {
+          parentTree.children = parentTree.children.filter((tree: Tree.RetrieveRes) => {
+            return tree.id !== movedTree.id;
+          })
+
+          const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(treeState.datas, parentTree);
+          treeDispatch({
+            type: TreeActionType.SET_SEARCH_RESULT,
+            datas: updatedTrees
+          });
+        }
+      });
+
+      showDirectories(data);
+      setSelectedTrees([]);
+    });
+  }
+
   // show
   const showFolder = (data: Tree.RetrieveRes) => {
     if (data.children && data.children.length > 0) {
@@ -203,6 +253,21 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
         });
       });
   };
+
+  const showSelectButton = () => {
+    treeDispatch({
+      type: TreeActionType.SET_SHOW_SELECT_BUTTON,
+      showSelectButton: !treeState.showSelectButton,
+    });
+  };
+
+  const showUpdateLocation = (data: Tree.RetrieveRes) => {
+    const result = window.confirm(`선택 파일들을 ${data.name} 아래로 이동하시겠습니까?`);
+
+    if (result) {
+      updateLocationTree(data);
+    }
+  }
   // -- show
 
   useEffect(() => {
@@ -227,35 +292,50 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
           {
             [Tree.Type.FORDER]:
               <div> 
+                {treeState.showSelectButton && 
+                  <Checkbox style={{ marginRight: "10px" }} onClick={(e: FormEvent<HTMLInputElement>)=> changeHandler(data)} checked={selectedTrees.includes(data) ? true : false} />
+                }
                 <Button color='orange' onClick={() => showFolder(data)} onContextMenu={(e: any) => showButtonGroup(e, data)}>
                   <Icon name='folder open outline' />
                   {data.name}
                 </Button>
-                {data.showBtnGroup && 
+                {data.showBtnGroup &&
                   <Button.Group basic size='mini'>
-                    <Button icon='plus square outline' onClick={() => showCreate(data)} />
-                    <Button icon='edit outline' onClick={() => showEdit(data)} />
-                    <Button icon='trash alternate outline' onClick={() => showDelete(data)} />
-                    <Button icon='angle up' onClick={() => upTree(data)} style={{display: index === 0 && 'none'}} />
-                    <Button icon='angle down' onClick={() => downTree(data)} style={{display: index === folderTotalCount-1 && 'none'}} />
+                    {!treeState.showSelectButton &&
+                      <>
+                        <Button icon='plus square outline' onClick={() => showCreate(data)} />
+                        <Button icon='edit outline' onClick={() => showEdit(data)} />
+                        <Button icon='trash alternate outline' onClick={() => showDelete(data)} />
+                        <Button icon='angle up' onClick={() => upTree(data)} style={{display: index === 0 && 'none'}} />
+                        <Button icon='angle down' onClick={() => downTree(data)} style={{display: index === folderTotalCount-1 && 'none'}} />
+                      </> 
+                    }
+                    {treeState.showSelectButton && !selectedTrees.includes(data) &&
+                      <>
+                        <Button icon='caret square left outline' onClick={() => showUpdateLocation(data)} />
+                      </>
+                    }
                   </Button.Group>
                 }
               </div>
             ,
             [Tree.Type.FILE]:
               <div>
+                {treeState.showSelectButton && 
+                  <Checkbox style={{ marginRight: "10px" }} onClick={(e: FormEvent<HTMLInputElement>)=> changeHandler(data)} checked={selectedTrees.includes(data) ? true : false} />
+                }
                 <Button color='blue' onClick={() => showFile(data)} onContextMenu={(e: any) => showButtonGroup(e, data)}>
                   <Icon name='file alternate outline' />
                   {data.name}
                 </Button>
-                {data.showBtnGroup && 
-                  <Button.Group basic size='mini'>
-                    <Button icon='edit outline' onClick={() => showEdit(data)} />
-                    <Button icon='trash alternate outline' onClick={() => showDelete(data)} />
-                    <Button icon='angle up' onClick={() => upTree(data)} style={{display: index === folderTotalCount && 'none'}} />
-                    <Button icon='angle down' onClick={() => downTree(data)} style={{display: index === folderTotalCount+fileTotalCount-1 && 'none'}} />
-                  </Button.Group>
-                }
+                  {data.showBtnGroup && !treeState.showSelectButton && 
+                    <Button.Group basic size='mini'>
+                      <Button icon='edit outline' onClick={() => showEdit(data)} />
+                      <Button icon='trash alternate outline' onClick={() => showDelete(data)} />
+                      <Button icon='angle up' onClick={() => upTree(data)} style={{display: index === folderTotalCount && 'none'}} />
+                      <Button icon='angle down' onClick={() => downTree(data)} style={{display: index === folderTotalCount+fileTotalCount-1 && 'none'}} />
+                    </Button.Group>
+                  }
               </div>
           }[data.type]
         }
@@ -270,6 +350,9 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
 
   return (
     <>
+      <Button.Group widths='2' color='green' style={{ margin: "0px 0px 8px 0px"}}>
+        <Button onClick={showSelectButton} >파일 이동</Button>
+      </Button.Group>
       <Button color='black' onClick={() => showDirectories(initialTree)} >
         user
       </Button>
