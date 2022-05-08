@@ -7,4 +7,5 @@ export interface TreeState {
   actionType: ActionType;
   targetTree: Tree;
   upsertTree: Tree;
+  showSelectButton: boolean;
 }

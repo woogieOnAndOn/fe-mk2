@@ -29,7 +29,8 @@ export const initialState: TreeState = {
     content: '',
     parent: 0,
     children: [],
-  }
+  },
+  showSelectButton: false,
 }
 
 export const reducer = (treeState: TreeState, action: TreeAction) => {
@@ -65,6 +66,12 @@ export const reducer = (treeState: TreeState, action: TreeAction) => {
         searchCondition: action.searchCondition,
         searchIndex: action.searchIndex,
         upsertTree: action.upsertTree,
+      };
+    }
+    case TreeActionType.SET_SHOW_SELECT_BUTTON: {
+      return {
+        ...treeState,
+        showSelectButton: action.showSelectButton,
       };
     }
     default:
