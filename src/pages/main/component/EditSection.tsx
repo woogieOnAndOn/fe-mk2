@@ -125,13 +125,14 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         setContentHtml(res);
       });
     } else {
+      const template = treeState.targetTree.content || '';
       setInputs({
         ...inputs,
         title: '',
-        contentMd: '',
+        contentMd: template,
       });
       setType(Tree.Type.FILE);
-      setContentHtml('');
+      setContentHtml(template);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [treeState.actionType, treeState.targetTree]);
@@ -191,32 +192,33 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
         </Form.Field>
 
         {/* 이미지 첨부 */}
-        {type === Tree.Type.FILE &&
-          <Form.Input type='file' multiple="multiple" onChange={handleChangeFile} accept='image/*' />
-        }
+        <Form.Input type='file' multiple="multiple" onChange={handleChangeFile} accept='image/*' />
 
         {/* 내용 */}
-        {type === Tree.Type.FILE &&
-          <Form.Field
-            name='contentMd'
-            control={TextArea}
-            label='내용'
-            style={{ minHeight: 500 }}
-            placeholder='내용을 입력해 주세요'
-            value={contentMd}
-            onKeyPress= {(e: any) => {
+        <Form.Field
+          name='contentMd'
+          control={TextArea}
+          label={type === Tree.Type.FILE ? '내용' : '템플릿'}
+          style={{ minHeight: 500 }}
+          placeholder='내용을 입력해 주세요'
+          value={contentMd}
+          onKeyPress= {(e: any) => {
+            if (treeState.actionType === Tree.ActionType.UPDATE) {
               if (e.key === 'Enter' && e.ctrlKey && !e.shiftKey) {
-                if (treeState.actionType === Tree.ActionType.UPDATE) updateTree();
-                else if (treeState.actionType === Tree.ActionType.CREATE) insertTree();
+                updateTree();
               } else if (e.key === 'Enter' && e.ctrlKey && e.shiftKey) {
-                if (treeState.actionType === Tree.ActionType.UPDATE) updateTree('finish');
+                updateTree('finish');
               }
-            }}
-            onChange={(e: any) => {
-              handleOnChange(e);
-            }}
-          />
-        }
+            } else if (treeState.actionType === Tree.ActionType.CREATE) {
+              if (e.key === 'Enter' && e.ctrlKey) {
+                insertTree();
+              }
+            }
+          }}
+          onChange={(e: any) => {
+            handleOnChange(e);
+          }}
+        />
         <Container fluid dangerouslySetInnerHTML={{__html: contentHtml}}></Container>
         {treeState.actionType === Tree.ActionType.CREATE ? 
           <Button primary type='submit' onClick={(e) => {
