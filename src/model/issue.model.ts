@@ -55,3 +55,9 @@ export enum State {
   COMPLETE = 'complete',
   END = 'end',
 }
+
+export enum ActionType {
+  CREATE = 'CREATE',
+  READ = 'READ',
+  UPDATE = 'UPDATE',
+}
