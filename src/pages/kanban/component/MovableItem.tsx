@@ -30,8 +30,6 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
   const [issueData, setIssueData] = useState<Issue.RetrieveRes>(issue);
   const [editOrNot, setEditOrNot] = useState<boolean>(false);
   const [checkedIssueCheckIds, setCheckedIssueCheckIds] = useState<number[]>([]);
-  const [newIssueChecks, setNewIssueChecks] = useState<IssueCheck.TmpCreateReq[]>([]);
-  const [deleteIssueChecks, setDeleteIssueChecks] = useState<IssueCheck.RetrieveRes[]>([]);
 
   const changeHandler = async (checked: boolean, checkId: number, issueId: number) => {
     if (checked) {
@@ -85,6 +83,9 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
     });
   };
 
+  const handleAfterEdit = () => {
+    setEditOrNot(false);
+  }
 
   useEffect(() => {
     if (issueData.issueChecks && issueData.issueChecks.length > 0) {
@@ -96,6 +97,14 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
       });
       setCheckedIssueCheckIds(issueCheckIds);
     }
+
+    const updatedIssues: Issue.RetrieveRes[] = [...issues];
+    updatedIssues.forEach((issue: Issue.RetrieveRes, index: number, issues: Issue.RetrieveRes[]) => {
+      if (issue.issueId === issueData.issueId) issues[index] = issueData;
+    });
+
+    setIssues(updatedIssues);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [issueData]);
 
   return (
@@ -103,8 +112,9 @@ const MovableItem: FC<ItemProps> = (props: ItemProps): ReactElement => {
       {editOrNot ? 
         <EditForm 
           actionType={Issue.ActionType.UPDATE}
-          afterEdit={() => setEditOrNot(false)}
+          afterEdit={handleAfterEdit}
           issue={issueData}
+          setIssue={setIssueData}
         />
           :
         <>
