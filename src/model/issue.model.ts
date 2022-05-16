@@ -10,7 +10,7 @@ export interface Issue {
 
 export interface CreateReq {
   issueName: string;
-  // issueChecks: string[];
+  issueChecks: IssueCheck.CreateReq[];
 }
 
 export interface UpdateReq {

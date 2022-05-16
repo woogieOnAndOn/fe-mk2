@@ -8,6 +8,7 @@ import KanbanService from '../../../service/kanban.service';
 import * as commonModel from '../../../model/common.model';
 import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor.util';
 import './MovableItem.css'
+import EditForm from './EditForm';
 
 interface ColumnProps {
   children?: ReactNode;
@@ -33,9 +34,18 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
   } = props;
   const kanbanService = new KanbanService();
 
-  const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
-  const [issueAndCheck, setIssueAndCheck] = useState<string>('');
+  const initialIssue: Issue.RetrieveRes = {
+    issueId: 0,
+    issueName: '',
+    issueState: Issue.State.WAIT,
+    useTime: 0.0,
+    creationDate: '',
+    issueChecks: [],
+  };
 
+  const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
+  const [createdIssue, setCreatedIssue] = useState<Issue.RetrieveRes>(initialIssue);
+  
   const [{canDrop, isOver}, drop] = useDrop(() => ({
     accept: Issue.ComponentType.ISSUE,
     drop: async (item: Issue.RetrieveRes, monitor: DropTargetMonitor) => {
@@ -100,13 +110,17 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
     })
   }));
 
-  const insertIssue = async () => {
-    const request: Issue.CreateReq = {
-      issueName: issueAndCheck,
+  const handleAfterEdit = () => {
+    setShowCreateForm(false);
+  }
+
+  useEffect(() => {
+    const createdIssueAlreadyPushed: boolean = issues.some((issue: Issue.RetrieveRes) => issue.issueId === createdIssue.issueId);
+    if (createdIssue.issueId !== 0 && !createdIssueAlreadyPushed) {
+      setIssues([...issues, createdIssue]);
     }
-    const response: commonModel.Message = await kanbanService.insertIssue(request);
-    ApiResultExecutor(response);
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [createdIssue])
 
   return (
     <Grid.Column style={{marginTop: '15px', marginLeft: issueState === Issue.State.WAIT && '20px', marginRight: issueState === Issue.State.END && '20px'}}>
@@ -126,27 +140,18 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
 
         <div ref={drop} style={{ minHeight: '500px', marginTop: '10px' }}>
 
-          {/* 텍스트 입력 창 */}
-          {showCreateForm && issueState === Issue.State.WAIT &&
-            <Form style={{margin: '20px 0px'}}>
-              <Form.Field 
-                control={TextArea} 
-                value={issueAndCheck}
-                style={{minHeight: 200}}
-                onKeyPress= {(e: any) => {
-                  if (e.key === 'Enter' && e.ctrlKey) {
-                    insertIssue();
-                  } 
-                }}
-                onChange={(e: any) => {
-                  setIssueAndCheck(e.target.value);
-                }}
-              />
-            </Form>
-          }
-
           {/* 이슈 */}
           {children}
+
+          {/* 텍스트 입력 창 */}
+          {showCreateForm && issueState === Issue.State.WAIT &&
+            <EditForm 
+              actionType={Issue.ActionType.CREATE}
+              afterEdit={handleAfterEdit}
+              issue={createdIssue}
+              setIssue={setCreatedIssue}
+            />
+          }
 
         </div>
       </Segment>
