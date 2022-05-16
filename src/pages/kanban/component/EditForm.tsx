@@ -11,6 +11,7 @@ interface PropTypes {
   actionType: Issue.ActionType,
   afterEdit: Function;
   issue?: Issue.RetrieveRes,
+  setIssue?: Function;
  }
 
 const EditForm: FC<PropTypes> = (props: PropTypes): ReactElement => {
@@ -72,7 +73,7 @@ const EditForm: FC<PropTypes> = (props: PropTypes): ReactElement => {
   const handleOnclickAddChecks = () => {
     const issueChecks: IssueCheck.TmpCreateReq[] = [...newIssueChecks];
     let maxIssueCheckId = 0;
-    issueData.issueChecks.forEach((data: IssueCheck.RetrieveRes, index: number) => {
+    issueData?.issueChecks?.forEach((data: IssueCheck.RetrieveRes, index: number) => {
       maxIssueCheckId = data.checkId > maxIssueCheckId ? data.checkId : maxIssueCheckId;
     })
 
@@ -133,21 +134,35 @@ const EditForm: FC<PropTypes> = (props: PropTypes): ReactElement => {
       });
     });
 
-    const updateIssueRequest: Issue.UpdateReq = {
-      issueId: issueData.issueId,
-      issueName: issueData.issueName,
-      useTime: issueData.useTime,
-      newIssueChecks: newIssueCheckRequest,
-      editIssueChecks: editIssueCheckRequest,
-      deleteIssueChecks: deleteIssueCheckRequest,
-    };
-
-    const updateIssueResponse: commonModel.Message = await kanbanService.updateIssueName(updateIssueRequest);
-    ApiResultExecutor(updateIssueResponse, true, () => props.afterEdit());
+    if (props.actionType === Issue.ActionType.CREATE) {
+      const createIssueRequest: Issue.CreateReq = {
+        issueName: issueData.issueName,
+        issueChecks: newIssueCheckRequest,
+      };
+      const insertIssueResponse: commonModel.Message = await kanbanService.insertIssue(createIssueRequest);
+      ApiResultExecutor(insertIssueResponse, true, () => {
+        props.setIssue && props.setIssue(insertIssueResponse.msObject);
+        props.afterEdit();
+      });
+    } else if (props.actionType === Issue.ActionType.UPDATE) {
+      const updateIssueRequest: Issue.UpdateReq = {
+        issueId: issueData.issueId,
+        issueName: issueData.issueName,
+        useTime: issueData.useTime,
+        newIssueChecks: newIssueCheckRequest,
+        editIssueChecks: editIssueCheckRequest,
+        deleteIssueChecks: deleteIssueCheckRequest,
+      };
+      const updateIssueResponse: commonModel.Message = await kanbanService.updateIssueName(updateIssueRequest);
+      ApiResultExecutor(updateIssueResponse, true, () => {
+        props.setIssue && props.setIssue(updateIssueResponse.msObject);
+        props.afterEdit();
+      });
+    }
   };
 
   useEffect(() => {
-    if (issueData.issueChecks && issueData.issueChecks.length > 0) {
+    if (issueData?.issueChecks && issueData.issueChecks.length > 0) {
       const issueCheckIds: number[] = [];
       issueData.issueChecks.forEach((check: IssueCheck.RetrieveRes, index: number) => {
         if (check.completeYn === 'Y') {
@@ -160,74 +175,49 @@ const EditForm: FC<PropTypes> = (props: PropTypes): ReactElement => {
   
   return (
     <Form className='editForm'>
-      <Grid columns={2}>
-        <Grid.Column width={16}>
-          <Form.Field 
-            name='issueName'
-            control={TextArea}
-            style={{ minHeight: 50 }}
-            placeholder='내용을 입력해 주세요'
-            value={issueData.issueName}
-            onChange={handleOnchangeIssueName} 
+      <Form.Field 
+        name='issueName'
+        control={TextArea}
+        style={{ minHeight: 50 }}
+        placeholder='내용을 입력해 주세요'
+        value={issueData?.issueName || ''}
+        onChange={handleOnchangeIssueName} 
+      />
+
+      {/* 수정시 기존 이슈체크 */}
+      {issueData?.issueChecks && issueData.issueChecks.length > 0 && issueData.issueChecks.map((check: IssueCheck.RetrieveRes, index) => (
+        <Form.Group widths={'equal'} key={'check-'+check.checkId}>
+          <Form.Input
+            key={'checkId-'+check.checkId}
+            name={'issueCheckName-'+check.checkId}
+            placeholder='내용' 
+            value={check?.checkName || ''} 
+            onChange={(e) => handleOnchangeIssueCheckName(e, check.checkId)} 
           />
-        </Grid.Column>
+          <Button icon='trash alternate outline' onClick={() => handleOnclickDeleteChecks(false, check.checkId)} />
+        </Form.Group>
+      ))}
 
-        {issueData.issueChecks && issueData.issueChecks.length > 0 && issueData.issueChecks.map((check: IssueCheck.RetrieveRes, index) => (
-          <>
-            <Grid.Column width={14}>
-              <Form.Input
-                key={'checkId-'+check.checkId}
-                name={'issueCheckName-'+check.checkId}
-                placeholder='내용' 
-                value={check.checkName} 
-                onChange={(e) => handleOnchangeIssueCheckName(e, check.checkId)} 
-              />
-            </Grid.Column>
-            <Grid.Column width={2}>
-              <Button.Group basic size='mini'>
-                <Button icon='trash alternate outline' onClick={() => handleOnclickDeleteChecks(false, check.checkId)} />
-              </Button.Group>
-            </Grid.Column>
-          </>
-        ))}
+      {/* 작성/수정시 새로운 이슈체크 */}
+      {newIssueChecks && newIssueChecks.length > 0 && newIssueChecks.map((newCheck: IssueCheck.TmpCreateReq, index: number) => (
+        <Form.Group widths={'equal'} key={'tmpCheck-'+newCheck.tmpCheckId}>
+          <Form.Input
+            key={'tmpCheckId-'+newCheck.tmpCheckId}
+            name={'newIssueCheckName-'+newCheck.tmpCheckId}
+            placeholder='내용' 
+            value={newCheck.checkName} 
+            onChange={(e) => handleOnchangenNewIssueCheckName(e, newCheck.tmpCheckId)} 
+          />
+          <Button icon='trash alternate outline' onClick={() => handleOnclickDeleteChecks(true, newCheck.tmpCheckId)} />
+        </Form.Group>
+      ))}
 
-        {newIssueChecks && newIssueChecks.length > 0 && newIssueChecks.map((newCheck: IssueCheck.TmpCreateReq, index: number) => (
-          <>
-            <Grid.Column width={14}>
-              <Form.Input
-                key={'tmpCheckId-'+newCheck.tmpCheckId}
-                name={'newIssueCheckName-'+newCheck.tmpCheckId}
-                placeholder='내용' 
-                value={newCheck.checkName} 
-                onChange={(e) => handleOnchangenNewIssueCheckName(e, newCheck.tmpCheckId)} 
-              />
-            </Grid.Column>
-            <Grid.Column width={2}>
-              <Button.Group basic size='mini'>
-                <Button icon='trash alternate outline' onClick={() => handleOnclickDeleteChecks(true, newCheck.tmpCheckId)} />
-              </Button.Group>
-            </Grid.Column>
-          </>
-        ))}
-
-        <Grid.Column width={16}>
-          <Button
-            color='orange'
-            floated='left'
-            onClick={handleOnclickAddChecks}
-          >
-            추가
-          </Button>
-          <Button
-            color='green'
-            floated='right'
-            type='submit'
-            onClick={handleOnclickEditSubmit}
-          >
-            수정
-          </Button>
-        </Grid.Column>
-      </Grid>
+      <Button color='orange' onClick={handleOnclickAddChecks}>
+        추가
+      </Button>
+      <Button color='green' onClick={handleOnclickEditSubmit}>
+        {props.actionType === Issue.ActionType.CREATE ? '등록' : '수정'}
+      </Button>
     </Form>
   )
 }
