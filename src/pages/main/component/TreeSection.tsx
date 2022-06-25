@@ -274,7 +274,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     // console.log('useEffect');
     showDirectories(treeState.searchCondition);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [treeState.upsertTree]);
+  }, [treeState.searchCondition]);
 
   type myType = { data: Tree.RetrieveRes, index: number, folderTotalCount: number, fileTotalCount: number};
   const RecursiveComponent = ({data, index, folderTotalCount, fileTotalCount}: myType) => {

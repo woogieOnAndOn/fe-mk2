@@ -11,18 +11,9 @@ export const initialState: TreeState = {
     parent: 0,
     children: [],
   },
-  searchIndex: 0,
   datas: [],
   actionType: Tree.ActionType.CREATE,
   targetTree: {
-    id: 0,
-    type: 20,
-    name: '',
-    content: '',
-    parent: 0,
-    children: [],
-  },
-  upsertTree: {
     id: 0,
     type: 20,
     name: '',
@@ -41,12 +32,6 @@ export const reducer = (treeState: TreeState, action: TreeAction) => {
         searchCondition: action.searchCondition,
       };
     }
-    case TreeActionType.SET_SEARCH_INDEX: {
-      return {
-        ...treeState,
-        searchIndex: action.searchIndex
-      }
-    }
     case TreeActionType.SET_SEARCH_RESULT: {
       return {
         ...treeState,
@@ -58,14 +43,6 @@ export const reducer = (treeState: TreeState, action: TreeAction) => {
         ...treeState,
         targetTree: action.targetTree,
         actionType: action.actionType,
-      };
-    }
-    case TreeActionType.SET_UPSERT_TREE: {
-      return {
-        ...treeState,
-        searchCondition: action.searchCondition,
-        searchIndex: action.searchIndex,
-        upsertTree: action.upsertTree,
       };
     }
     case TreeActionType.SET_SHOW_SELECT_BUTTON: {

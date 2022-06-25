@@ -47,9 +47,8 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
     ApiResultExecutor(result, false, () => {
       const insertedTree: Tree.RetrieveRes = result.msObject;
       treeDispatch({
-        type: TreeActionType.SET_UPSERT_TREE,
-        searchCondition: treeState.targetTree,
-        upsertTree: request,
+        type: TreeActionType.SET_SEARCH_CONDITION,
+        searchCondition: {...treeState.targetTree},
       });
 
       treeDispatch({
