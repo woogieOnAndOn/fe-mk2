@@ -15,6 +15,7 @@ import EditSection from './section/EditSection';
 import { useContext } from 'react';
 
 import parseMd from '../../scripts/common/Parser.util';
+import EditButtonGroup from './component/EditButtonGroup';
 
 const MainPage: React.FC = (): ReactElement => {
   const { treeState, treeDispatch } = useContext(TreeContext);
@@ -62,9 +63,16 @@ const MainPage: React.FC = (): ReactElement => {
             <EditSection />
 
             {/* 파일 조회 뷰 */}
-            <div className='fileView' style={{display: treeState.actionType !== Tree.ActionType.READ ? 'none' : 'block'}}>
-              <div dangerouslySetInnerHTML={{__html: contentHtml}}></div>
-            </div>
+            {treeState.actionType === Tree.ActionType.READ &&
+              <div className='fileView'>
+                <EditButtonGroup 
+                  targetTree={treeState.targetTree} 
+                  showButtonList={[Tree.ActionType.UPDATE, Tree.ActionType.DELETE]}
+                  floated={'right'}
+                />
+                <div dangerouslySetInnerHTML={{__html: contentHtml}}></div>
+              </div>
+            }
           </Segment>
         </Grid.Column>
       </Grid>

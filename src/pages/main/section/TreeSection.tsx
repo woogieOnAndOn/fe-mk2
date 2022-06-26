@@ -142,10 +142,10 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
           {data.showBtnGroup &&
             <EditButtonGroup 
               targetTree={data}
+              showButtonList={[Tree.ActionType.CREATE, Tree.ActionType.UPDATE, Tree.ActionType.DELETE, Tree.ActionType.UP, Tree.ActionType.DOWN]}
               targetTreeIndex={index}
               folderTotalCount={folderTotalCount}
               fileTotalCount={fileTotalCount}
-              showButtonList={[Tree.ActionType.CREATE, Tree.ActionType.UPDATE, Tree.ActionType.DELETE, Tree.ActionType.UP, Tree.ActionType.DOWN]}
               selectedTrees={selectedTrees}
               setSelectedTrees={setSelectedTrees}
               showDirectories={showDirectories}

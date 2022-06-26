@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Icon, Button, Checkbox } from 'semantic-ui-react'
+import { Icon, Button, Checkbox, SemanticFLOATS } from 'semantic-ui-react'
 import React, { useState, useEffect, useContext, FormEvent } from 'react';
 import { TreeContext, TreeProvider } from '../../../contexts/TreeContext';
 import { TreeActionType } from '../../../reducer/tree/actions';
@@ -12,11 +12,12 @@ import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor.util';
 
 interface PropTypes { 
   targetTree: Tree.RetrieveRes;
-  targetTreeIndex: number;
-  folderTotalCount: number;
-  fileTotalCount: number;
   showButtonList: Tree.ActionType[],
+  targetTreeIndex?: number;
+  folderTotalCount?: number;
+  fileTotalCount?: number;
   selectedTrees?: Tree.RetrieveRes[],
+  floated?: SemanticFLOATS;
   setSelectedTrees?: Function;
   showDirectories?: Function;
 }
@@ -186,14 +187,14 @@ const EditButtonGroup: React.FC<PropTypes> = (props: PropTypes) => {
   }
 
   return (
-    <Button.Group basic size='mini'>
+    <Button.Group basic size='mini' floated={props.floated!}>
       {!treeState.showSelectButton ?
         <span>
-          props.showButtonList.includes(Tree.ActionType.CREATE) && <Button icon='plus square outline' onClick={() => showCreate(props.targetTree)} />
-          props.showButtonList.includes(Tree.ActionType.UPDATE) && <Button icon='edit outline' onClick={() => showEdit(props.targetTree)} />
-          props.showButtonList.includes(Tree.ActionType.DELETE) && <Button icon='trash alternate outline' onClick={() => showDelete(props.targetTree)} />
-          props.showButtonList.includes(Tree.ActionType.UP) && <Button icon='angle up' onClick={() => upTree(props.targetTree)} style={{display: props.targetTreeIndex === 0 && 'none'}} />
-          props.showButtonList.includes(Tree.ActionType.DOWN) && <Button icon='angle down' onClick={() => downTree(props.targetTree)} style={{display: props.targetTreeIndex === (props.targetTree.type === Tree.Type.FORDER ? props.folderTotalCount-1 : props.folderTotalCount+props.fileTotalCount-1) && 'none'}} />
+          {(props.showButtonList.includes(Tree.ActionType.CREATE) && props.targetTree.type === Tree.Type.FORDER) && <Button icon='plus square outline' onClick={() => showCreate(props.targetTree)} /> }
+          {props.showButtonList.includes(Tree.ActionType.UPDATE) && <Button icon='edit outline' onClick={() => showEdit(props.targetTree)} />}
+          {props.showButtonList.includes(Tree.ActionType.DELETE) && <Button icon='trash alternate outline' onClick={() => showDelete(props.targetTree)} />}
+          {props.showButtonList.includes(Tree.ActionType.UP) && <Button icon='angle up' onClick={() => upTree(props.targetTree)} style={{display: props.targetTreeIndex === 0 && 'none'}} />}
+          {props.showButtonList.includes(Tree.ActionType.DOWN) && <Button icon='angle down' onClick={() => downTree(props.targetTree)} style={{display: props.targetTreeIndex === (props.targetTree.type === Tree.Type.FORDER ? props.folderTotalCount!-1 : props.folderTotalCount!+props.fileTotalCount!-1) && 'none'}} />}
         </span>
         :
         !props.selectedTrees!.includes(props.targetTree) && <Button icon='caret square left outline' onClick={() => showUpdateLocation(props.targetTree)} />
