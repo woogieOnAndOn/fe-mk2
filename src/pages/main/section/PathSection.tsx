@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useContext, useEffect, useState } from 'react';
-import { Icon, Step } from 'semantic-ui-react'
+import { Icon, SemanticICONS, Step } from 'semantic-ui-react'
 import { TreeContext } from '../../../contexts/TreeContext';
 import * as Tree from '../../../model/tree.model';
 import { findTreePathById } from '../../../scripts/tree/Tree.util';
@@ -11,6 +11,24 @@ interface PropTypes {  }
 const PathSection: React.FC<PropTypes> = (props: PropTypes) => {
   const { treeState } = useContext(TreeContext);
   const [paths, setPaths] = useState<string[]>([]);
+  const [iconName, setIconName] = useState<SemanticICONS>('write');
+
+  useEffect(() => {
+    switch (treeState.actionType) {
+      case Tree.ActionType.CREATE:
+        setIconName('folder open outline');
+        break;
+      case Tree.ActionType.READ:
+        setIconName('file alternate outline');
+        break;
+      case Tree.ActionType.UPDATE:
+        setIconName('write');
+        break;
+      default:
+        setIconName('write');
+        break;
+    }
+  }, [treeState.actionType])
 
   useEffect(() => {
     const result: string[] = findTreePathById(treeState.datas, treeState.targetTree.id);
@@ -35,13 +53,7 @@ const PathSection: React.FC<PropTypes> = (props: PropTypes) => {
       ))}
       {treeState.targetTree.name !== '' && 
         <Step active>
-          {
-            {
-              [Tree.ActionType.CREATE]: <Icon name='folder open outline' />,
-              [Tree.ActionType.READ]: <Icon name='file alternate outline' />,
-              [Tree.ActionType.UPDATE]: <Icon name='write' />
-            }[treeState.actionType]
-          }
+          <Icon name={iconName!} />
           <Step.Content>
             <Step.Title>{treeState.targetTree.name}</Step.Title>
           </Step.Content>
