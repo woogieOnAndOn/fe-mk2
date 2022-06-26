@@ -1,12 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ApiServiceName } from "../model/common.model";
-import { Code, Comic, ComicSearchCondition, RequestDeleteComic } from "../model/comic.model";
+import { Code, Comic, ComicSearchCondition } from "../model/comic.model";
 import CommonService from "./common.service";
 
 export default class ComicService extends CommonService {
 
   async retrieveCode(): Promise<Code[]> {
     const response = await this.callApi(ApiServiceName.MK4, 'GET', `/mk4/codes`, null, null);
+    return response.status === 200 ? response.data : null;
+  }
+
+  async updateCode<T>(request: Code): Promise<T> {
+    const response = await this.callApi(ApiServiceName.MK4, 'PUT', `/mk4/codes/${request.codeId}`, null, request);
     return response.status === 200 ? response.data : null;
   }
 
@@ -25,9 +30,9 @@ export default class ComicService extends CommonService {
     return response.status === 200 ? response.data : null;
   }
 
-  // async deleteComic<T>(request: RequestDeleteComic): Promise<T> {
-  //   const response = await this.callApi(ApiServiceName.MK4, 'DELETE', `/mk4/comics/${request.id}`, null, request);
-  //   return response.status === 200 ? response.data : null;
-  // }
+  async deleteComic<T>(comicId: number): Promise<T> {
+    const response = await this.callApi(ApiServiceName.MK4, 'DELETE', `/mk4/comics/${comicId}`, null, null);
+    return response.status === 200 ? response.data : null;
+  }
 
 }

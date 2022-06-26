@@ -6,7 +6,7 @@ export interface Code {
 export interface Comic {
   comicId: number;
   comicName: string;
-  lastViewEpisode: number;
+  lastViewEpisode: string;
   lastUpdateDate: string;
   categoryId: string;
   selected?: boolean;
@@ -14,8 +14,5 @@ export interface Comic {
 
 export interface ComicSearchCondition {
   categoryId: string;
-}
-
-export interface RequestDeleteComic {
-
+  comicName: string;
 }

@@ -19,6 +19,7 @@ const ComicPage: React.FC = (): ReactElement => {
   const [inputs, setInputs] = useState({ comicId: '', comicName: '', lastViewEpisode: '', lastUpdateDate: '', categoryId: '' });
   const { comicId, comicName, lastViewEpisode } = inputs;
   const editSection = useRef<HTMLDivElement>(null);
+  const selectedSection = useRef<HTMLDivElement>(null);
   
   const handleOnChange = (e: any) => {
     const { name, value } = e.target;
@@ -28,21 +29,21 @@ const ComicPage: React.FC = (): ReactElement => {
     });
   }
 
-  const changeHandler = (id: number, name: string,inputText: string) => {
+  const changeHandler = (id: number, name: string, inputText: string) => {
     const changedComics: Comic[] = [...comicList];
     let comic = changedComics.find((data: Comic, index:number) => {return data.comicId === id});
 
     if (comic) {
       comic.comicId = id;
       comic.comicName = name;
-      comic.lastViewEpisode = Number(inputText);
+      comic.lastViewEpisode = inputText.replace(/[^0-9|^.]/g, '');
       comic.lastUpdateDate = getToday();
       comic.categoryId = baseUri.key;
     } else {
       changedComics.push({
         comicId: id,
         comicName: name,
-        lastViewEpisode: Number(inputText),
+        lastViewEpisode: inputText.replace(/[^0-9|^.]/g, ''),
         lastUpdateDate: getToday(),
         categoryId: baseUri.key,
       });
@@ -52,52 +53,17 @@ const ComicPage: React.FC = (): ReactElement => {
   };
 
   const getToday = () => {
-    var date = new Date();
-    var year = date.getFullYear();
-    var month = ("0" + (1 + date.getMonth())).slice(-2);
-    var day = ("0" + date.getDate()).slice(-2);
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = ("0" + (1 + date.getMonth())).slice(-2);
+    const day = ("0" + date.getDate()).slice(-2);
+    const hour = date.getHours();
+    const minitutes = date.getMinutes();
+    const seconds = date.getSeconds();
 
-    return year + "-" + month + "-" + day;
+    // return year + "-" + month + "-" + day + " " + hour;
+    return `${year}-${month}-${day} ${hour}:${minitutes}:${seconds}`;
   }
-
-  useEffect(() => {
-    const asyncRetrieveCode = async () => {
-      return await service.retrieveCode();
-    }
-
-    asyncRetrieveCode().then((res: Code[]) => {
-      if (res) {
-        const codes: DropdownItemProps[] = [];
-        for (let i = 0; i < res.length; i++) {
-          const dropDownContent = {
-            key: res[i].codeId,
-            value: res[i].codeName,
-            text: res[i].codeId,
-          };
-          codes.push(dropDownContent);
-
-          if (i === 0) {
-            setBaseUri(dropDownContent);
-          }
-        }
-        setCategory(codes);
-      }
-    })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const asyncRetrieveComic = async () => {
-      return await service.retrieveComic({ categoryId: String(baseUri.text) });
-    }
-
-    asyncRetrieveComic().then((res: Comic[]) => {
-      if (res) {
-        setComicList(res);
-      }
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseUri, refreshComicList])
 
   const handleOnclickCategory = async (event: SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
     const selectedOption: any | undefined = data.options?.find((option: any) => {
@@ -162,7 +128,7 @@ const ComicPage: React.FC = (): ReactElement => {
         if (!response) {
           alert('실패')
         } else {
-          setRefreshComicList(!refreshComicList);
+          setRefreshComicList(true);
         }
       }
     } catch(err) {
@@ -181,11 +147,88 @@ const ComicPage: React.FC = (): ReactElement => {
     if (!response) {
       alert('실패');
     } else {
-      setRefreshComicList(!refreshComicList);
+      setRefreshComicList(true);
       setInputs({ comicId: '', comicName: '', lastViewEpisode: '', lastUpdateDate: '', categoryId: '' });
     }
 
   }
+
+  const deleteComic = async (data: Comic) => {
+    if (window.confirm(`${data.comicName} 을 삭제 하시겠습니까?`)) {
+      const response = await service.deleteComic(data.comicId);
+  
+      if (!response) {
+        alert('실패');
+      } else {
+        setRefreshComicList(true);
+      }
+    }
+  };
+
+  const combackToSelectedComit = () => {
+    selectedSection.current?.focus();
+  }
+
+  const searchComicList = () => {
+    setRefreshComicList(true);
+  }
+
+  const editCodeName = async () => {
+    const response = await service.updateCode({ codeId: String(baseUri.text), codeName: String(baseUri.value) });
+
+    if (!response) {
+      alert('실패');
+    } else {
+      window.location.reload();
+    }
+  }
+
+  const handleOnChangeForCode = (inputText: string) => {
+    setBaseUri({...baseUri, value: inputText});
+  }
+
+  useEffect(() => {
+    const asyncRetrieveCode = async () => {
+      return await service.retrieveCode();
+    }
+
+    asyncRetrieveCode().then((res: Code[]) => {
+      if (res) {
+        const codes: DropdownItemProps[] = [];
+        for (let i = 0; i < res.length; i++) {
+          const dropDownContent = {
+            key: res[i].codeId,
+            value: res[i].codeName,
+            text: res[i].codeId,
+          };
+          codes.push(dropDownContent);
+
+          if (i === 0) {
+            setBaseUri(dropDownContent);
+          }
+        }
+        setCategory(codes);
+        setRefreshComicList(true);
+      }
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const asyncRetrieveComic = async () => {
+      return await service.retrieveComic({ categoryId: String(baseUri.text), comicName: String(comicName) });
+    }
+
+    if (refreshComicList) {
+      asyncRetrieveComic().then((res: Comic[]) => {
+        if (res) {
+          setComicList(res);
+        }
+      });
+      setRefreshComicList(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [baseUri, refreshComicList])
 
   return (
     <Container fluid>
@@ -193,15 +236,37 @@ const ComicPage: React.FC = (): ReactElement => {
         <Grid.Column width={8}>
           <Segment>
             <Form>
-              <Form.Group inline>
-              {category && category.length > 0 &&
-                <Dropdown 
-                  selection 
-                  options={category} 
-                  defaultValue={category[0].value}
-                  onChange={handleOnclickCategory} 
+              <Form.Group>
+                {category && category.length > 0 &&
+                  <Dropdown 
+                    selection 
+                    options={category} 
+                    defaultValue={category[0].value}
+                    onChange={handleOnclickCategory} 
+                  />
+                }
+                <Form.Input
+                  name='baseUri'
+                  type='text'
+                  value={baseUri.value}
+                  onChange={(e) => handleOnChangeForCode(e.target.value)}
                 />
-              }
+                <Button
+                  color='green' 
+                  size='small'
+                  type='submit'
+                  onClick={editCodeName}
+                >
+                  수정
+                </Button>
+                <Button
+                  color='orange' 
+                  size='small'
+                  type='submit'
+                  onClick={() => window.open(String(baseUri.value).replace(/comic\/|webtoon\//g,''))}
+                >
+                  이동
+                </Button>
               </Form.Group>
             </Form>
 
@@ -211,7 +276,7 @@ const ComicPage: React.FC = (): ReactElement => {
                   <List.Content>
                     <List.Header as='a'>
                       <Form>
-                        <Form.Group inline>
+                        <Form.Group>
                           <Form.Input 
                             name='comicId'
                             type='text' 
@@ -222,7 +287,7 @@ const ComicPage: React.FC = (): ReactElement => {
                           <Form.Input 
                             name='comicName'
                             type='text' 
-                            width={9}
+                            width={7}
                             value={comicName}
                             onChange={handleOnChange} 
                           />
@@ -241,6 +306,14 @@ const ComicPage: React.FC = (): ReactElement => {
                           >
                             추가
                           </Button>
+                          <Button
+                            color='orange' 
+                            size='small'
+                            type='submit'
+                            onClick={searchComicList}
+                          >
+                            검색
+                          </Button>
                         </Form.Group>
                       </Form>
                     </List.Header>
@@ -249,6 +322,7 @@ const ComicPage: React.FC = (): ReactElement => {
               }
               {comicList && comicList.map((data: Comic, index: number) => (
                 <List.Item key={index}>
+                  {data.selected && <div ref={selectedSection} tabIndex={-1}></div>}
                   <List.Content>
                     <List.Header 
                       as='a' 
@@ -264,7 +338,7 @@ const ComicPage: React.FC = (): ReactElement => {
                     <List.Description as='a'>
                       <Form>
                         <div id="lastUpdateDateSection">
-                          {data.lastUpdateDate}
+                          {data.lastUpdateDate.replace(/T|Z/g, ' ')}
                         </div>
                         <Form.Group inline>
                           <Form.Button 
@@ -321,6 +395,15 @@ const ComicPage: React.FC = (): ReactElement => {
                           >
                             적용
                           </Form.Button>
+                          <Form.Button
+                            className='lastViewSubmitBtn'
+                            color='grey' 
+                            size='mini'
+                            type='submit'
+                            onClick={() => deleteComic(data)}
+                          >
+                            삭제
+                          </Form.Button>
                         </Form.Group>
                       </Form>
                     </List.Description>
@@ -332,6 +415,7 @@ const ComicPage: React.FC = (): ReactElement => {
         </Grid.Column>
         <Grid.Column width={8}>
           <Segment>
+            <Button color='teal' onClick={combackToSelectedComit} >돌아가기</Button>
             <div ref={editSection} tabIndex={-1}></div>
             <List divided relaxed>
               {listHtml && listHtml.map((data: string, index: number) => (
