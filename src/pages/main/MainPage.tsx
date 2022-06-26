@@ -9,9 +9,9 @@ import { TreeContext, TreeProvider } from '../../contexts/TreeContext';
 import { TreeActionType } from '../../reducer/tree/actions'
 import * as Tree from '../../model/tree.model';
 
-import TreeSection from './component/TreeSection';
-import PathSection from './component/PathSection';
-import EditSection from './component/EditSection';
+import TreeSection from './section/TreeSection';
+import PathSection from './section/PathSection';
+import EditSection from './section/EditSection';
 import { useContext } from 'react';
 
 import parseMd from '../../scripts/common/Parser.util';
