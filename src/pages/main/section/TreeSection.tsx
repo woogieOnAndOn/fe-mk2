@@ -11,6 +11,7 @@ import { findAndUpdateTree, findIndexById, findTreeById } from '../../../scripts
 import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor.util';
 
 import EditButtonGroup from '../component/EditButtonGroup';
+import { initialState } from '../../../reducer/tree/index';
 
 interface PropTypes {  }
 
@@ -19,15 +20,6 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
   const treeService = new TreeService();
 
   const [selectedTrees, setSelectedTrees] = useState<Tree.RetrieveRes[]>([]);
-
-  const initialTree: Tree.RetrieveRes = {
-    id: 0,
-    type: Tree.Type.FORDER,
-    name: 'user',
-    content: '',
-    parent: 0,
-    children: [],
-  };
 
   const folderTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === Tree.Type.FORDER).length;
   const fileTotalCount = treeState.datas && treeState.datas!.filter(data => data.type === Tree.Type.FILE).length;
@@ -72,14 +64,6 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     });
   }
 
-  const showCreate = async (data: Tree.RetrieveRes) => {
-    treeDispatch({
-      type: TreeActionType.SET_TARGET_TREE_AND_ACTION_TYPE,
-      targetTree: data,
-      actionType: Tree.ActionType.CREATE
-    });
-  }
-
   const showButtonGroup = (e:any , data: Tree.RetrieveRes) => {
     e.preventDefault();
     data.showBtnGroup = !data.showBtnGroup;
@@ -98,7 +82,9 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
       .then(response => {
         let updatedTrees: Tree.RetrieveRes[] = [];
         if (newSearchCondition.parent === 0) {
-          updatedTrees = response;
+          const initialTrees = [initialState.targetTree];
+          initialTrees[0].children = response;
+          updatedTrees = initialTrees;
         } else {
           data.children = response;
           let tmpState: Tree.RetrieveRes[] = treeState.datas;
@@ -136,7 +122,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     }
 
     return (
-      <div key={data.id} style={{ margin: "5px 0px 5px 5px"}}>
+      <div key={data.id} style={{ margin: "5px 0px 5px 0px"}}>
         <div>
           {treeState.showSelectButton && 
             <Checkbox 
@@ -146,11 +132,11 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
             />
           }
           <Button 
-            color={data.type === Tree.Type.FORDER ? 'orange' : 'blue'}
+            color={data.type === Tree.Type.FORDER ? (data.id === 0 ? 'black' : 'orange') : 'blue'}
             onClick={() => data.type === Tree.Type.FORDER ? showFolder(data) : showFile(data)} 
             onContextMenu={(e: any) => showButtonGroup(e, data)}
           >
-            <Icon name={data.type === Tree.Type.FORDER ? 'folder open outline' : 'file alternate outline'} />
+            {data.id !== 0 && <Icon name={data.type === Tree.Type.FORDER ? 'folder open outline' : 'file alternate outline'} />}
             {data.name}
           </Button>
           {data.showBtnGroup &&
@@ -177,14 +163,8 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
 
   return (
     <>
-      <Button.Group widths='2' color='green' style={{ margin: "0px 0px 8px 0px"}}>
+      <Button.Group widths='2' color='green'>
         <Button onClick={showSelectButton} >파일 이동</Button>
-      </Button.Group>
-      <Button color='black' onClick={() => showDirectories(initialTree)} >
-        {initialTree.name}
-      </Button>
-      <Button.Group basic size='mini'>
-        <Button icon='plus square outline' onClick={() => showCreate(initialTree)} />
       </Button.Group>
       {treeState.datas && treeState.datas!.map((data, index) => (
         <RecursiveComponent key={index} data={data} index={index} folderTotalCount={folderTotalCount} fileTotalCount={fileTotalCount}/>

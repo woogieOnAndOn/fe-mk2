@@ -15,8 +15,8 @@ export const initialState: TreeState = {
   actionType: Tree.ActionType.CREATE,
   targetTree: {
     id: 0,
-    type: 20,
-    name: '',
+    type: 10,
+    name: 'user',
     content: '',
     parent: 0,
     children: [],
