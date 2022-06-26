@@ -63,3 +63,11 @@ export const findTreePathById = (trees: Tree.RetrieveRes[], targetId: number): s
   
   return paths;
 }
+
+export const findIndexById = (trees: Tree.RetrieveRes[], targetId: number): number => {
+  let targetIndex = 0;
+  trees.forEach((tree: Tree.RetrieveRes, index: number) => {
+    tree.id === targetId && (targetIndex = index);
+  });
+  return targetIndex;
+}

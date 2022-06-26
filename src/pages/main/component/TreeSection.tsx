@@ -7,7 +7,7 @@ import TreeService from '../../../service/tree.service';
 
 import { Message } from '../../../model/common.model';
 import * as Tree from '../../../model/tree.model';
-import { findAndUpdateTree, findTreeById } from '../../../scripts/tree/Tree.util';
+import { findAndUpdateTree, findIndexById, findTreeById } from '../../../scripts/tree/Tree.util';
 import ApiResultExecutor from '../../../scripts/common/ApiResultExecutor.util';
 
 interface PropTypes {  }
@@ -21,7 +21,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
   const initialTree: Tree.RetrieveRes = {
     id: 0,
     type: Tree.Type.FORDER,
-    name: '',
+    name: 'user',
     content: '',
     parent: 0,
     children: [],
@@ -55,21 +55,24 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     };
 
     const result: Message = await treeService.deleteTree(request);
-    ApiResultExecutor(result, false, () => {
+    ApiResultExecutor(result, true, () => {
       const parentTree: Tree.RetrieveRes | null = findTreeById(treeState.datas, data.parent);
       if (parentTree) {
         const children: Tree.RetrieveRes[] = parentTree.children;
-        let targetIndex = 0;
-        children.forEach((tree: Tree.RetrieveRes, index: number) => {
-          tree.id === data.id && (targetIndex = index);
-        })
-        children.splice(targetIndex, 1);
+        children.splice(findIndexById(children, data.id), 1);
         parentTree.children = children;
 
         const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(treeState.datas, parentTree);
         treeDispatch({
           type: TreeActionType.SET_SEARCH_RESULT,
           datas: updatedTrees
+        });
+      } else {
+        const tmpState = [...treeState.datas];
+        tmpState.splice(findIndexById(tmpState, data.id), 1);
+        treeDispatch({
+          type: TreeActionType.SET_SEARCH_RESULT,
+          datas: tmpState
         });
       }
     });
@@ -86,22 +89,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     const result: Message = await treeService.updateSeqTree(request);
     ApiResultExecutor(result, false, () => {
       const parentTree: Tree.RetrieveRes | null = findTreeById(treeState.datas, data.parent);
-      if (parentTree) {
-        const children: Tree.RetrieveRes[] = parentTree.children;
-        let targetIndex = 0;
-        children.forEach((tree: Tree.RetrieveRes, index: number) => {
-          tree.id === data.id && (targetIndex = index);
-        })
-        children[targetIndex] = children[targetIndex-1];
-        children[targetIndex-1] = data;
-        parentTree.children = children;
-        
-        const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(treeState.datas, parentTree);
-        treeDispatch({
-          type: TreeActionType.SET_SEARCH_RESULT,
-          datas: updatedTrees
-        });
-      }
+      relocateAfterUpAndDown(parentTree, true, data);
     });
   };
 
@@ -116,24 +104,36 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
     const result: Message = await treeService.updateSeqTree(request);
     ApiResultExecutor(result, false, () => {
       const parentTree: Tree.RetrieveRes | null = findTreeById(treeState.datas, data.parent);
-      if (parentTree) {
-        const children: Tree.RetrieveRes[] = parentTree.children;
-        let targetIndex = 0;
-        children.forEach((tree: Tree.RetrieveRes, index: number) => {
-          tree.id === data.id && (targetIndex = index);
-        })
-        children[targetIndex] = children[targetIndex+1];
-        children[targetIndex+1] = data;
-        parentTree.children = children;
-        
-        const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(treeState.datas, parentTree);
-        treeDispatch({
-          type: TreeActionType.SET_SEARCH_RESULT,
-          datas: updatedTrees
-        });
-      }
+      relocateAfterUpAndDown(parentTree, false, data);
     });
   };
+
+  const relocateAfterUpAndDown = (parentTree: Tree.RetrieveRes | null, isUp: boolean, targetTree: Tree.RetrieveRes) => {
+    const calculationNumber = isUp ? -1 : 1;
+    if (parentTree) {
+      const children: Tree.RetrieveRes[] = parentTree.children;
+      let targetIndex = findIndexById(children, targetTree.id);
+      children[targetIndex] = children[targetIndex + calculationNumber];
+      children[targetIndex + calculationNumber] = targetTree;
+      parentTree.children = children;
+      
+      const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(treeState.datas, parentTree);
+      treeDispatch({
+        type: TreeActionType.SET_SEARCH_RESULT,
+        datas: updatedTrees
+      });
+    } else {
+      const tmpState = [...treeState.datas];
+        let targetIndex = findIndexById(tmpState, targetTree.id);
+        tmpState[targetIndex] = tmpState[targetIndex + calculationNumber];
+        tmpState[targetIndex + calculationNumber] = targetTree;
+        
+        treeDispatch({
+          type: TreeActionType.SET_SEARCH_RESULT,
+          datas: tmpState
+        });
+    }
+  }
 
   const updateLocationTree = async (data: Tree.RetrieveRes) => {
     const selectedTreeForReq: Tree.RetrieveRes[] = [];
@@ -354,7 +354,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
         <Button onClick={showSelectButton} >파일 이동</Button>
       </Button.Group>
       <Button color='black' onClick={() => showDirectories(initialTree)} >
-        user
+        {initialTree.name}
       </Button>
       <Button.Group basic size='mini'>
         <Button icon='plus square outline' onClick={() => showCreate(initialTree)} />
