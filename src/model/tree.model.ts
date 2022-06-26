@@ -60,6 +60,9 @@ export enum ActionType {
   CREATE = 'CREATE',
   READ = 'READ',
   UPDATE = 'UPDATE',
+  DELETE = 'DELETE',
+  UP = 'UP',
+  DOWN = 'DOWN',
 }
 
 export enum Type {
