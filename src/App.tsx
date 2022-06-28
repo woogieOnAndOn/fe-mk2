@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
 import { TreeProvider } from './contexts/TreeContext';
 
-import { MainPage, KanbanPage, ComicPage, AuthPage } from './pages';
+import { MainPage, KanbanPage, AuthPage } from './pages';
 
 const App = () => {
 
@@ -16,9 +16,6 @@ const App = () => {
       </Switch>
       <Switch>
         <Route path="/kanban" component={KanbanPage}></Route>
-      </Switch>
-      <Switch>
-        <Route path="/comic" component={ComicPage}></Route>
       </Switch>
       <Switch>
         <Route path="/auth" component={AuthPage}></Route>
