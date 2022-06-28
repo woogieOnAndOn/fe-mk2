@@ -44,7 +44,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
 
   // show
   const showFolder = (data: Tree.RetrieveRes) => {
-    if (data.children && data.children.length > 0) {
+    if (data.id !== 0 &&data.children && data.children.length > 0) {
       data.children = [];
       const updatedTrees: Tree.RetrieveRes[] = findAndUpdateTree(treeState.datas, data);
       treeDispatch({
@@ -153,7 +153,7 @@ const TreeSection: React.FC<PropTypes> = (props: PropTypes) => {
           }
         </div>
         {hasChildren && data.children.map((item: any, idx: number) => (
-          <div key={data.id + idx} style={{marginLeft: "20px"}}>
+          <div key={data.id + idx} style={item.parent === 0 ? {marginLeft: "10px"} : {marginLeft: "20px"}}>
             <RecursiveComponent key={item.id} data={item} index={idx} folderTotalCount={childFolderTotalCount} fileTotalCount={childFileTotalCount}/>
           </div>
         ))}
