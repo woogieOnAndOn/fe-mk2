@@ -54,25 +54,7 @@ const AcceptableColumn: React.FC<ColumnProps> = (props: ColumnProps): ReactEleme
         issueState: issueState
       });
 
-      ApiResultExecutor(updateResult, false, async () => {
-        if (updateResult.msId) {
-          let updateUseTimeResult: commonModel.Message = {
-            msId: 1,
-            msContent: '',
-          };
-          switch (issueState) {
-            case Issue.State.WAIT:
-            case Issue.State.COMPLETE:
-              if (item.issueState === Issue.State.START) {
-                updateUseTimeResult = await kanbanService.updateUseTime({ issueId: item.issueId });
-                ApiResultExecutor(updateUseTimeResult);
-              }
-              break;
-            default: 
-              break;
-          }
-        }
-      });
+      ApiResultExecutor(updateResult);
 
       item.issueState = issueState;
       let targetIndex = 0;
