@@ -136,13 +136,14 @@ const EditSection:  React.FC<PropTypes> = (props: PropTypes) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [treeState.actionType, treeState.targetTree]);
 
-  useEffect(() => {
-    handleOnChange({ 
-      target: { name: 'contentMd', value: '' }
-    });
-    setContentHtml('');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type]);
+  // 타입 변경 시 내용 삭제 처리(폴더 수정시 템플릿 항목에 내용이 안들어 오는 이슈로 주석처리)
+  // useEffect(() => {
+  //   handleOnChange({ 
+  //     target: { name: 'contentMd', value: '' }
+  //   });
+  //   setContentHtml('');
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [type]);
 
   useEffect(() => {
     const asyncParseMd = async (data: string) => {
